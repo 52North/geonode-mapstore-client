@@ -579,6 +579,7 @@ function DetailsPanel({
                                     </CopyToClipboard>
                                     }
                                     {detailUrl && !editThumbnail && <Button
+                                        target={(resource?.resource_type === "externalapplication") ? "_blank" : ""}
                                         variant="primary"
                                         href={(resourceCanPreviewed) ? detailUrl : metadataDetailUrl}
                                         rel="noopener noreferrer">

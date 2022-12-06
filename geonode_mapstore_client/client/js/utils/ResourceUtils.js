@@ -256,7 +256,7 @@ export const ResourceTypes = {
     DASHBOARD: 'dashboard'
 };
 
-export const getResourceTypesInfo = () => ({
+export const ResourceTypesInfos = {
     [ResourceTypes.DATASET]: {
         icon: 'database',
         canPreviewed: (resource) => resourceHasPermission(resource, 'view_resourcebase'),
@@ -300,8 +300,18 @@ export const getResourceTypesInfo = () => ({
         formatEmbedUrl: (resource) => resource?.embed_url && parseDevHostname(resource.embed_url),
         formatDetailUrl: (resource) => resource?.detail_url && parseDevHostname(resource.detail_url),
         formatMetadataUrl: (resource) => (`/apps/${resource.pk}/metadata`)
+    },
+    ["externalapplication"]: {
+        icon: 'icon',
+        name: 'ExternalApplication',
+        canPreviewed: (resource) => resourceHasPermission(resource, 'view_resourcebase'),
+        formatEmbedUrl: (resource) => resource?.embed_url && parseDevHostname(resource.embed_url),
+        formatDetailUrl: (resource) => resource?.detail_url && parseDevHostname(resource.detail_url),
+        formatMetadataUrl: (resource) => resource.url
     }
-});
+}
+
+export const getResourceTypesInfo = () => ResourceTypesInfos;
 
 export const getMetadataUrl = (resource) => {
     if (resource) {
