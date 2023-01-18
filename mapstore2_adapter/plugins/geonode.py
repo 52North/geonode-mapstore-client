@@ -308,6 +308,10 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
             tb = traceback.format_exc()
             logger.debug(tb)
 
+        # This fixes the WMS url for layers and maps. However, there is still a problem
+        # (WMS request to remote service url) when creating a new map.
+        data = self._fix_sta_wms_url(data)
+
         json_str = json.dumps(data, cls=DjangoJSONEncoder, sort_keys=True)
         for (c, d) in unsafe_chars.items():
             json_str = json_str.replace(c, d)
@@ -640,3 +644,29 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
         elif 'featureInfo' in layer and layer['featureInfo']:
             featureInfo = layer['featureInfo']
         return featureInfo
+
+    def _fix_sta_wms_url(self, config, url=None):
+        """
+        By default the MapStore layer created for a remote service is of type 'wms' and
+        uses the remote service url (i.e. STA server) to make WMS requests which causes errors
+        (because MapStore doesn't know how to handle the json response from the STA server landing page).
+        This function replaces the url with the internal geoserver url where a layer for GeoNode
+        STA layers should be created beforehand.
+        """
+        if url is None:
+            url = 'http://localhost/geoserver/wms'
+
+        from geonode.layers.models import Layer
+        for idx, layer in enumerate(config['map']['layers']):
+            try:
+                if 'name' in layer:
+                    layer_obj = Layer.objects.get(name=layer['name'])
+                    if layer_obj.remote_service.type == 'STA':
+                        del config['map']['layers'][idx]
+                        layer['url'] = url
+                        config['map']['layers'].append(layer)
+            except Exception:
+                tb = traceback.format_exc()
+                logger.debug(tb)
+
+        return config
