@@ -664,6 +664,10 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
                     if layer_obj.remote_service.type == 'STA':
                         del config['map']['layers'][idx]
                         layer['url'] = url
+                        # change info_format to application/json instead of plain/text
+                        layer['featureInfo'] = {
+                            'format': 'TEMPLATE',
+                        }
                         config['map']['layers'].append(layer)
             except Exception:
                 tb = traceback.format_exc()
