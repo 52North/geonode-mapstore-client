@@ -679,7 +679,7 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
     </div>
     <div class="row">
         <div class="col-xs-6" style="font-weight: bold; word-wrap: break-word;">ObservedProperty:</div>
-        <div class="col-xs-6" style="word-wrap: break-word;">${{properties.ObservedProperty}}</div>
+        <div class="col-xs-6" style="word-wrap: break-word;">${{properties.ObservedPr}}</div>
     </div>
     <div class="row">
         <div class="col-xs-6" style="font-weight: bold; word-wrap: break-word;">Sensor:</div>
