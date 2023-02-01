@@ -52,7 +52,7 @@ unsafe_chars = {
 
 # {layer_param_key: default_value}
 """
- ref. 
+ ref.
 https://github.com/geosolutions-it/MapStore2/blob/master/web/client/utils/LayersUtils.js#L485-L541
 """
 LAYER_PARAMS = {
@@ -364,7 +364,7 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
             source = sources[layer['source']]
             overlay = {}
             if 'url' in source:
-                if 'ptype' not in source or source['ptype'] != 'gxp_arcrestsource': 
+                if 'ptype' not in source or source['ptype'] != 'gxp_arcrestsource':
                     overlay['type'] = "wms"
                     overlay['tileSize'] = getattr(settings, "DEFAULT_TILE_SIZE", 512)
                 else:
@@ -656,6 +656,7 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
         if url is None:
             url = 'http://localhost/geoserver/wms'
 
+
         from geonode.layers.models import Layer
         for idx, layer in enumerate(config['map']['layers']):
             try:
@@ -667,6 +668,28 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
                         # change info_format to application/json instead of plain/text
                         layer['featureInfo'] = {
                             'format': 'TEMPLATE',
+                            'template': f"""<div>
+    <div class="row">
+        <div class="col-xs-6" style="font-weight: bold; word-wrap: break-word;">Datastream:</div>
+        <div class="col-xs-6" style="word-wrap: break-word;"><a target="_parent" href="{layer_obj.detail_url}"><span class="glyphicon glyphicon-info-sign"></span>{layer['title']}</a></div>
+    </div>
+    <div class="row">
+        <div class="col-xs-6" style="font-weight: bold; word-wrap: break-word;">Thing:</div>
+        <div class="col-xs-6" style="word-wrap: break-word;">${{properties.Thing}}</div>
+    </div>
+    <div class="row">
+        <div class="col-xs-6" style="font-weight: bold; word-wrap: break-word;">ObservedProperty:</div>
+        <div class="col-xs-6" style="word-wrap: break-word;">${{properties.ObservedProperty}}</div>
+    </div>
+    <div class="row">
+        <div class="col-xs-6" style="font-weight: bold; word-wrap: break-word;">Sensor:</div>
+        <div class="col-xs-6" style="word-wrap: break-word;">${{properties.Sensor}}</div>
+    </div>
+    <div class="row">
+        <div class="col-xs-6" style="font-weight: bold; word-wrap: break-word;">Dashboard:</div>
+        <div class="col-xs-6" style="word-wrap: break-word;"><a target="_parent" href="${{properties.Dashboard}}"><span class="glyphicon glyphicon-map-marker"></span>open dashboard</a></div>
+    </div>
+</div>"""
                         }
                         config['map']['layers'].append(layer)
             except Exception:
