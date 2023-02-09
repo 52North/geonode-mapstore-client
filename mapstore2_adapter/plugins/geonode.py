@@ -647,10 +647,10 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
 
     def _fix_sta_wms_url(self, config, url=None):
         """
-        By default the MapStore layer created for a remote service is of type 'wms' and
+        By default, the MapStore layer created for a remote service is of type 'wms' and
         uses the remote service url (i.e. STA server) to make WMS requests which causes errors
         (because MapStore doesn't know how to handle the json response from the STA server landing page).
-        This function replaces the url with the internal geoserver url where a layer for GeoNode
+        This function replaces the url with the internal GeoServer url where a layer for GeoNode
         STA layers should be created beforehand.
         """
         if url is None:
@@ -663,7 +663,6 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
                 if 'name' in layer:
                     layer_obj = Layer.objects.get(name=layer['name'])
                     if layer_obj.remote_service.type == 'STA':
-                        del config['map']['layers'][idx]
                         layer['url'] = url
                         # change info_format to application/json instead of plain/text
                         layer['featureInfo'] = {
@@ -691,7 +690,7 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
     </div>
 </div>"""
                         }
-                        config['map']['layers'].append(layer)
+                        config['map']['layers'][idx] = layer
             except Exception:
                 tb = traceback.format_exc()
                 logger.debug(tb)
