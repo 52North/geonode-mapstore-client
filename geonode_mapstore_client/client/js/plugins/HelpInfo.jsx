@@ -49,7 +49,7 @@ function HelpModal(props) {
                             <img src={arrow} className="icon"></img>
                             {<Message msgId="helpInfo.quickstart5"/>}
                             <img src={burger} className="icon"></img>
-                            {<Message msgId="helpInfo.quickstart6"/>} <a href='https://canwin-public-docs.readthedocs.io/en/latest/CanWIN_GeoNode_Guide/>'>https://canwin-public-docs.readthedocs.io/en/latest/CanWIN_GeoNode_Guide/.</a>
+                            {<Message msgId="helpInfo.quickstart6"/>} <a href='https://canwin-public-docs.readthedocs.io/en/latest/CanWIN_GeoNode_Guide/'>https://canwin-public-docs.readthedocs.io/en/latest/CanWIN_GeoNode_Guide/.</a>
                         </p>
                         <div className='closeButton'>
                             <Button onClick={()=>setOpen(false)}>
