@@ -410,6 +410,14 @@
                 }
             },
             {
+                "name": "HelpInfo",
+                "override": {
+                    "Toolbar": {
+                        "alwaysVisible": true
+                    }
+                }
+            },
+            {
                 "name": "Identify",
                 "cfg": {
                     "showFullscreen": true,
@@ -608,6 +616,14 @@
                                 "altShiftDragRotate": false
                             }
                         }
+                    }
+                }
+            },
+            {
+                "name": "HelpInfo",
+                "override": {
+                    "Toolbar": {
+                        "alwaysVisible": true
                     }
                 }
             },
@@ -2394,6 +2410,14 @@
             },
             {
                 "name": "BackgroundSelector"
+            },
+            {
+                "name": "HelpInfo",
+                "override": {
+                    "Toolbar": {
+                        "alwaysVisible": true
+                    }
+                }
             },
             {
                 "name": "Identify",
