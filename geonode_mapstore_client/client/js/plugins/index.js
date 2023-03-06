@@ -95,10 +95,6 @@ export const plugins = {
         'HelpInfo',
         () => import(/* webpackChunkName: 'plugins/help-info-plugin' */ '@js/plugins/HelpInfo')
     ),
-    StaHandlerPlugin: toLazyPlugin(
-        'StaHandler',
-        () => import(/* webpackChunkName: 'plugins/sta-handler-plugin' */ '@js/plugins/StaHandler')        
-    ),
     LayerDownloadPlugin: toLazyPlugin(
         'LayerDownload',
         () => import(/* webpackChunkName: 'plugins/layer-download' */ '@mapstore/framework/plugins/LayerDownload')
