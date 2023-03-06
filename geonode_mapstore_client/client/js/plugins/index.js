@@ -91,6 +91,14 @@ function splitLazyAndStaticPlugins(pluginsDefinition) {
 // provides a way to import dynamically plugins similar to extensions
 
 export const plugins = {
+    HelpInfoPlugin: toLazyPlugin(
+        'HelpInfo',
+        () => import(/* webpackChunkName: 'plugins/help-info-plugin' */ '@js/plugins/HelpInfo')
+    ),
+    StaHandlerPlugin: toLazyPlugin(
+        'StaHandler',
+        () => import(/* webpackChunkName: 'plugins/sta-handler-plugin' */ '@js/plugins/StaHandler')        
+    ),
     LayerDownloadPlugin: toLazyPlugin(
         'LayerDownload',
         () => import(/* webpackChunkName: 'plugins/layer-download' */ '@mapstore/framework/plugins/LayerDownload')

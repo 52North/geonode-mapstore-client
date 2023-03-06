@@ -1,0 +1,19 @@
+.helpInfoModal{
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.helpInfoVideo{
+    width: 450px; 
+    height: 315px;
+}
+
+.closeButton{
+    justify-content: flex-end;
+    display: flex;
+}
+
+.icon{
+    width: 5%;
+}

@@ -4,6 +4,16 @@
         "geostory": {
             "geoNode": "GeoNode"
         },
+        "helpInfo": {
+            "title": "Information",
+            "header": "Schnellstart",
+            "quickstart1": "Um einen Layer hinzuzufügen, klicken Sie den Layers-Knopf ",
+            "quickstart2": " oben links auf Ihrem Bildschirm. Sie sehen dann zwei Knöpfe in der Mitte, klicken Sie auf den linken “Layer hinzufügen”-Knopf ",
+            "quickstart3": " . Der Katalog erscheint dann auf der rechten Seite. Sie können scrollen um den gewünschen Layer zu finden oder danach suchen. Klicken Sie den 'Plus'-Knopf ",
+            "quickstart4": " , um den Layer zur Karte hinzuzufügen. Der 'Erweitern'-Knopf ",
+            "quickstart5": " zeigt das Asbtract des Layers. Um die Karte zu drucken oder zu speichern, drücken Sie den Hamburger-button ",
+            "quickstart6": " auf der rechten Seite Ihres Bildschirms. Für eine vollständige Anleitung zur Nutzung des CanWin Kartenportal, schauen Sie bitte hier nach "
+        },
         "mediaEditor": {
             "imageList": {
                 "emptyList": "Keine Ergebnisse für diese Anfrage. Versuchen Sie, den Filter zu wechseln oder einen anderen Dienst aus der Eingabe in der oberen rechten Ecke auszuwählen."

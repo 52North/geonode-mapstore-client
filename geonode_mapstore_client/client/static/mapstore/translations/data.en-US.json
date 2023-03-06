@@ -4,6 +4,16 @@
         "geostory": {
             "geoNode": "GeoNode"
         },
+        "helpInfo": {
+            "title": "Information",
+            "header": "Quick Start",
+            "quickstart1": "To add a layer, click the Layers button ",
+            "quickstart2": " on the top left of your screen. You will see two buttons in the middle, click the left “Add layer” button ",
+            "quickstart3": " . The Catalog will appear on the right side. You can search or scroll to find your desired layer. Click the 'Plus' button ",
+            "quickstart4": " to add the desired layer to your map. The 'Expand' button ",
+            "quickstart5": " will provide the abstract of the layer. To print or save your map, click the hamburger button ",
+            "quickstart6": " on the right side of screen. For a full guide on using CanWin's map portal please see "
+        },
         "mediaEditor": {
             "imageList": {
                 "emptyList": "No results for this request. Try to change filter or select a different service from the input in the top right corner."

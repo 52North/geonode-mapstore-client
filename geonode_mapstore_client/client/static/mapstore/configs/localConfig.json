@@ -410,6 +410,17 @@
                 }
             },
             {
+                "name": "HelpInfo",
+                "override": {
+                    "Toolbar": {
+                        "alwaysVisible": true
+                    }
+                }
+            },
+            {
+                "name": "StaHandler"
+            },
+            {
                 "name": "Identify",
                 "cfg": {
                     "showFullscreen": true,
@@ -610,6 +621,17 @@
                         }
                     }
                 }
+            },
+            {
+                "name": "HelpInfo",
+                "override": {
+                    "Toolbar": {
+                        "alwaysVisible": true
+                    }
+                }
+            },
+            {
+                "name": "StaHandler"
             },
             {
                 "name": "BackgroundSelector"
@@ -2394,6 +2416,17 @@
             },
             {
                 "name": "BackgroundSelector"
+            },
+            {
+                "name": "HelpInfo",
+                "override": {
+                    "Toolbar": {
+                        "alwaysVisible": true
+                    }
+                }
+            },
+            {
+                "name": "StaHandler"
             },
             {
                 "name": "Identify",
