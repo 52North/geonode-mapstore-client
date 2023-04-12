@@ -654,8 +654,8 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
         STA layers should be created beforehand.
         """
         if url is None:
-            url = 'http://localhost/geoserver/wms'
-
+            url = getattr(settings, "GEOSERVER_PUBLIC_LOCATION", "http://localhost/geoserver/")
+            url = f"{url}wms"
 
         from geonode.layers.models import Layer
         for idx, layer in enumerate(config['map']['layers']):
