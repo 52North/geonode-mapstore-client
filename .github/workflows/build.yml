@@ -10,9 +10,9 @@ on:
   # Triggers the workflow on push events but only for the master branch
   push:
     branches: [ 52n-master ]
-    # paths: 
-    #   - "geonode_mapstore_client/client/**"
-    #   - "!geonode_mapstore_client/client/version.txt"
+    paths: 
+      - "geonode_mapstore_client/client/**"
+      - "!geonode_mapstore_client/client/version.txt"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
