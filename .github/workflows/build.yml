@@ -39,7 +39,7 @@ jobs:
       - name: "Setting up npm"
         uses: actions/setup-node@v3
         with:
-            node-version: '16.x'
+            node-version: '12.x'
 
       ############
       # CACHING
