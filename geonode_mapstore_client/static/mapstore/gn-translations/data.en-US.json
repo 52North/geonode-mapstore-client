@@ -175,6 +175,12 @@
             "sync": "Sync",
             "close": "Close",
             "share": "Share",
+            "litterassessment": {
+                "button": "PlasticOps+", 
+                "title": "Litter Assessment",
+                "description": "Choose a model and start litter assessment for the dataset via DEEPaaS inference API.",
+                "model": "Inference Model"
+            },
             "download": "Download",
             "moreinfo": "More info",
             "setMapLikeThumbnail": "Set map thumbnail",

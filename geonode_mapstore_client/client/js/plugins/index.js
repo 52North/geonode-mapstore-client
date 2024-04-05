@@ -194,6 +194,10 @@ export const plugins = {
         'Share',
         () => import(/* webpackChunkName: 'plugins/share-plugin' */ '@js/plugins/Share')
     ),
+    LitterAssessmentPlugin: toModulePlugin(
+        'LitterAssessment',
+        () => import(/* webpackChunkName: 'plugins/litterassessment-plugin' */ '@js/plugins/LitterAssessment')
+    ),
     IdentifyPlugin: toModulePlugin(
         'Identify',
         () => import(/* webpackChunkName: 'plugins/identify-plugin' */ '@mapstore/framework/plugins/Identify')
