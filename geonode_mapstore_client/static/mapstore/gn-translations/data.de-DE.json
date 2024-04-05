@@ -175,6 +175,12 @@
             "sync": "Synchronisieren",
             "close": "Schließen",
             "share": "Teilen",
+            "litterassessment": {
+                "button": "PlasticOps+", 
+                "title": "Müllerkennung",
+                "description": "Wählen Sie ein Modell und starten Sie die Müllerkennung für den Datensatz via DEEPaaS Inferenz API.",
+                "model": "Inferenzmodell"
+            },
             "download": "Herunterladen",
             "moreinfo": "Mehr Informationen",
             "setMapLikeThumbnail": "Miniaturansicht festlegen",

@@ -626,6 +626,22 @@
                             ]
                         },
                         {
+                            "type": "plugin",
+                            "name": "Share"
+                        },
+                        {
+                            "type": "plugin",
+                            "name": "LitterAssessment"
+                        },
+                        {
+                            "type": "plugin",
+                            "name": "Print"
+                        },
+                        {
+                            "type": "plugin",
+                            "name": "FilterLayer"
+                        },
+                        {
                             "labelId": "gnviewer.download",
                             "disableIf": "{!state('selectedLayerPermissions').includes('download_resourcebase') || context.isDocumentExternalSource(state('gnResourceData'))}",
                             "type": "dropdown",
@@ -687,6 +703,12 @@
                 "cfg": {
                     "containerPosition": "rightOverlay",
                     "enableGeoLimits": true
+                }
+            },
+            {
+                "name": "LitterAssessment",
+                "cfg": {
+                    "containerPosition": "rightOverlay"
                 }
             },
             {
