@@ -10,6 +10,7 @@ import Message from '@mapstore/framework/components/I18N/Message';
 import controls from '@mapstore/framework/reducers/controls';
 import Button from '@js/components/Button';
 import OverlayContainer from '@js/components/OverlayContainer';
+import { getProxyUrl } from '@mapstore/framework/utils/ConfigUtils'
 import {
     getResourceId,
 } from '@js/selectors/resource';
@@ -17,8 +18,8 @@ import {
 
 // class LitterAssessmentApi {
 async function getModels() {
-    return fetch("http://localhost:5000/v2/models/")
-        .then(({ data } = {}) => data.json())
+    return fetch("/proxy/?url=" + encodeURIComponent("http://172.18.0.1:5000/v2/models/"))
+        .then(response => response.json())
         .catch(
             function (error) {
               console.log('Show error notification!')
@@ -45,7 +46,9 @@ function LitterAssessment({
     }, []);
 
     useEffect(() => {
-        getModels().then(models => setModels(models));
+        getModels().then(response => setModels(response.models)).catch(error => {
+            console.log(error);
+        });
     })
 
     return (
