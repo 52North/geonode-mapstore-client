@@ -10,13 +10,35 @@ import Message from '@mapstore/framework/components/I18N/Message';
 import controls from '@mapstore/framework/reducers/controls';
 import Button from '@js/components/Button';
 import OverlayContainer from '@js/components/OverlayContainer';
-import { getProxyUrl } from '@mapstore/framework/utils/ConfigUtils'
 import {
     getResourceId,
 } from '@js/selectors/resource';
+import Form from '@rjsf/core';
+
+const schema = {
+    title: 'Input Data',
+    type: 'object',
+    required: [],
+    properties: {
+      PLD: {
+        in: "query",
+        type: "boolean",
+        title: "PLD plot",
+        description: "Whether a detection plot should be provided.",
+        default: true
+      },
+      PLQ: {
+        in: "query",
+        type: "boolean",
+        title: "PLD plot",
+        description: "Whether a quantification plot should be provided.",
+        default: true
+      }
+    },
+  };
 
 
-// class LitterAssessmentApi {
+
 async function getModels() {
     return fetch("/proxy/?url=" + encodeURIComponent("http://172.18.0.1:5000/v2/models/"))
         .then(response => response.json())
@@ -27,7 +49,6 @@ async function getModels() {
             }
           );
 }
-//   }
 
 
 function LitterAssessment({
@@ -49,7 +70,7 @@ function LitterAssessment({
         getModels().then(response => setModels(response.models)).catch(error => {
             console.log(error);
         });
-    })
+    }, []);
 
     return (
         <OverlayContainer
@@ -72,6 +93,7 @@ function LitterAssessment({
                         <select>
                             {models.map(model => <option>{model.name}</option>)}
                         </select>
+                        <Form schema={schema} />,
                     </div>
                 </div>
             </section>
