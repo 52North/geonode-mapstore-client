@@ -631,7 +631,8 @@
                         },
                         {
                             "type": "plugin",
-                            "name": "LitterAssessment"
+                            "name": "LitterAssessment",
+                            "disableIf": "{!(state('gnResourceData').subtype === 'raster' && context.resourceHasPermission(state('gnResourceData'), 'change_resourcebase'))}"
                         },
                         {
                             "type": "plugin",
