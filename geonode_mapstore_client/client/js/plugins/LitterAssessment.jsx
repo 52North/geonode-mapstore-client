@@ -38,6 +38,8 @@ const schema = {
   };
 
 
+const log = (type) => console.log.bind(console, type);
+
 
 async function getModels() {
     return fetch("/proxy/?url=" + encodeURIComponent("http://172.18.0.1:5000/v2/models/"))
@@ -51,12 +53,19 @@ async function getModels() {
 }
 
 
+async function triggerAiInference({formdata}, e) {
+    console.info(`sending form data: ${JSON.stringify(formdata)}`);
+
+    return setTimeout(() => console.log("release"), 3000)
+}
+
 function LitterAssessment({
     enabled,
     onClose
 }) {
 
     const [models, setModels] = useState([{name: "model a"}, {name: "model b"}]);
+    const [formData, setFormData] = React.useState(null);
 
     const isMounted = useRef(false);
     useEffect(() => {
@@ -93,7 +102,15 @@ function LitterAssessment({
                         <select>
                             {models.map(model => <option>{model.name}</option>)}
                         </select>
-                        <Form schema={schema} />,
+                        <Form schema={schema} 
+                              onChange={e => setFormData(e.formData)}
+                              onSubmit={log("onSubmit")}
+                              onError={log("errors")}>
+                                <div>
+                                    // https://github.com/rjsf-team/react-jsonschema-form/blob/v4.2.3/docs/api-reference/form-props.md#children
+                                    <button type="submit" onClick="triggerAiInference">Submit</button>
+                                </div>
+                        </Form>
                     </div>
                 </div>
             </section>
