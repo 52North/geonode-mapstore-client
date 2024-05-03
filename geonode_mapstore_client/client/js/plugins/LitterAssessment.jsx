@@ -4,18 +4,23 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { Glyphicon } from 'react-bootstrap';
+import assign from 'object-assign';
+
 import { createPlugin } from '@mapstore/framework/utils/PluginsUtils';
 import { setControlProperty } from '@mapstore/framework/actions/controls';
+import { addAuthenticationParameter } from '@mapstore/framework/utils/SecurityUtils'
 import Message from '@mapstore/framework/components/I18N/Message';
 import controls from '@mapstore/framework/reducers/controls';
+
 import Button from '@js/components/Button';
 import OverlayContainer from '@js/components/OverlayContainer';
 import {
     getResourceId,
 } from '@js/selectors/resource';
+
 import Form from '@rjsf/core';
 
-const schema = {
+const jsonSchema = {
     title: 'Input Data',
     type: 'object',
     required: [],
@@ -59,8 +64,34 @@ async function triggerAiInference({formdata}, e) {
     return setTimeout(() => console.log("release"), 3000)
 }
 
+
+function toWmsUrl(wmsLayerOptions, securityToken) {
+    const bounds = wmsLayerOptions.bbox.bounds;
+    const bbox = [bounds.minx, bounds.miny, bounds.maxx, bounds.maxy];
+    const queryParameters = assign({}, {
+        LAYERS: wmsLayerOptions.name,
+        STYLES: wmsLayerOptions.style || "",
+        FORMAT: 'image/png8',
+        TRANSPARENT: true,
+        SERVICE: "WMS",
+        REQUEST: "GetMap",
+        WIDTH: "1000",
+        HEIGHT: "600",
+        BBOX: bbox,
+        TILED: false,
+        VERSION: "1.3.0"
+    });
+
+    const url = wmsLayerOptions.url;
+    addAuthenticationParameter(url, queryParameters, securityToken)
+    const query = new URLSearchParams(queryParameters)
+    return new URL(`${url}?${query}`).toString()
+}
+
 function LitterAssessment({
     enabled,
+    wmsLayers=[],
+    securityToken,
     onClose
 }) {
 
@@ -81,6 +112,15 @@ function LitterAssessment({
         });
     }, []);
 
+    /*
+     
+     */
+
+    // https://github.com/rjsf-team/react-jsonschema-form/blob/v4.2.3/docs/api-reference/form-props.md#children
+
+    const wmsLayer = wmsLayers?.length ? toWmsUrl(wmsLayers[0], securityToken) : "";
+
+
     return (
         <OverlayContainer
             enabled={enabled}
@@ -99,17 +139,19 @@ function LitterAssessment({
                     <Message msgId="gnviewer.litterassessment.description" />
                     <div>
                         <label><Message msgId="gnviewer.litterassessment.model" /></label>
+                        
                         <select>
                             {models.map(model => <option>{model.name}</option>)}
                         </select>
-                        <Form schema={schema} 
+
+                        <Form schema={jsonSchema} 
                               onChange={e => setFormData(e.formData)}
-                              onSubmit={log("onSubmit")}
+                              onSubmit={e => triggerAiInference(e)}
                               onError={log("errors")}>
                                 <div>
-                                    // https://github.com/rjsf-team/react-jsonschema-form/blob/v4.2.3/docs/api-reference/form-props.md#children
                                     <button type="submit" onClick="triggerAiInference">Submit</button>
                                 </div>
+                                <input type="hidden" name="wmsUrl" value={wmsLayer} />
                         </Form>
                     </div>
                 </div>
@@ -132,9 +174,13 @@ LitterAssessment.defaultProps = {
 
 const LitterAssessmentPlugin = connect(
     createSelector([
-        state => state?.controls?.rightOverlay?.enabled === 'LitterAssessment'
-    ], (enabled) => ({
-        enabled
+        state => state?.controls?.rightOverlay?.enabled === 'LitterAssessment',
+        state => state.layers,
+        state => state.security
+    ], (enabled, layers, security) => ({
+        enabled,
+        wmsLayers: layers?.flat?.filter( l => l.type === "wms" && (!l.group || l.group !== "background")) || [],
+        securityToken: security.token
     })),
     {
         onClose: setControlProperty.bind(null, 'rightOverlay', 'enabled', false),
