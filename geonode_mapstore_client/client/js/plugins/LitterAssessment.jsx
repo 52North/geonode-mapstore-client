@@ -21,49 +21,65 @@ import {
 import Form from '@rjsf/core';
 
 const jsonSchema = {
-    title: 'Input Data',
-    type: 'object',
-    required: [],
-    properties: {
-      PLD: {
-        in: "query",
-        type: "boolean",
-        title: "PLD plot",
-        description: "Whether a detection plot should be provided.",
-        default: true
-      },
-      PLQ: {
-        in: "query",
-        type: "boolean",
-        title: "PLD plot",
-        description: "Whether a quantification plot should be provided.",
-        default: true
-      }
+  title: "Input Data",
+  type: "object",
+  required: [],
+  properties: {
+    input: {
+      type: "string",
+    },
+    PLD: {
+      in: "query",
+      type: "boolean",
+      title: "PLD plot",
+      description: "Whether a detection plot should be provided.",
+      default: true,
+    },
+    PLQ: {
+      in: "query",
+      type: "boolean",
+      title: "PLD plot",
+      description: "Whether a quantification plot should be provided.",
+      default: true,
+    },
+  },
+};
+
+const uiSchema = {
+    input: {
+      "ui:widget": "hidden",
+    },
+    PLD: {
+      "ui:widget": "radio",
+    },
+    PLQ: {
+      "ui:widget": "radio",
     },
   };
-
 
 const log = (type) => console.log.bind(console, type);
 
 
 async function getModels() {
-    return fetch("/proxy/?url=" + encodeURIComponent("http://172.18.0.1:5000/v2/models/"))
-        .then(response => response.json())
-        .catch(
-            function (error) {
-              console.log('Show error notification!')
-              return Promise.reject(error)
-            }
-          );
+
+function triggerAiInference({ formData }) {
+  console.info(`sending form data ...`);
+
+  const headers = {
+    "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
+  };
+
+  const data = assign(formData, { accept: "application/json" });
+  const url =
+    "http://172.18.0.1:5000/v2/models/litter_assessment_service/predict";
+  axios.post(url, data, headers).then((response) => {
+    console.info(`receiving response: ${JSON.stringify(response)}`);
+
+    // TODO handle jobID
+  });
+
+  return setTimeout(() => console.log("release"), 3000);
 }
-
-
-async function triggerAiInference({formdata}, e) {
-    console.info(`sending form data: ${JSON.stringify(formdata)}`);
-
-    return setTimeout(() => console.log("release"), 3000)
-}
-
 
 function toWmsUrl(wmsLayerOptions, securityToken) {
     const bounds = wmsLayerOptions.bbox.bounds;
@@ -144,20 +160,7 @@ function LitterAssessment({
                             {models.map(model => <option>{model.name}</option>)}
                         </select>
 
-                        <Form schema={jsonSchema} 
-                              onChange={e => setFormData(e.formData)}
-                              onSubmit={e => triggerAiInference(e)}
-                              onError={log("errors")}>
-                                <div>
-                                    <button type="submit" onClick="triggerAiInference">Submit</button>
-                                </div>
-                                <input type="hidden" name="wmsUrl" value={wmsLayer} />
-                        </Form>
-                    </div>
-                </div>
-            </section>
-        </OverlayContainer>
-    );
+              formData={{input: wmsLayer}}
 }
 
 
