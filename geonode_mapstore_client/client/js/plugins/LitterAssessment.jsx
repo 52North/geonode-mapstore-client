@@ -108,8 +108,6 @@ function LitterAssessment({ enabled, wmsLayers = [], securityToken, onClose }) {
       });
   }, []);
 
-  // https://github.com/rjsf-team/react-jsonschema-form/blob/v4.2.3/docs/api-reference/form-props.md#children
-
   const wmsLayer = wmsLayers?.length
     ? toWmsUrl(wmsLayers[0], securityToken)
     : "";
@@ -128,11 +126,11 @@ function LitterAssessment({ enabled, wmsLayers = [], securityToken, onClose }) {
         <div className="gn-litterassessment-panel-body">
           <Message msgId="gnviewer.litterassessment.description" />
           <div>
-            <label>
+            <label for="model-select">
               <Message msgId="gnviewer.litterassessment.model" />
             </label>
 
-            <select
+            <select id="model-select"
               onChange={(event) => setSelectedModel(event.target.value)}
               value={selectedModel}
             >

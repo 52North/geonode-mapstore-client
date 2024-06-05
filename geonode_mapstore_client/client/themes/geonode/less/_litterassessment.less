@@ -22,6 +22,7 @@
     width: 100%;
     height: 100%;
     display: flex;
+    padding: 1em;
     flex-direction: column;
     .gn-litterassessment-panel-head {
         display: flex;
@@ -32,13 +33,16 @@
             margin: 0;
             font-size: 1.4rem;
         }
-        margin: 0 0.5rem;
     }
     .gn-litterassessment-panel-body {
         flex: 1;
         overflow: auto;
         position: relative;
         width: 100%;
+
+        #model-select {
+            margin-left: 1em;
+        }
     }
     .ms-popover {
         display: inline-block;
