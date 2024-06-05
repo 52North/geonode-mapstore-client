@@ -12,79 +12,46 @@ import { addAuthenticationParameter } from "@mapstore/framework/utils/SecurityUt
 import Message from "@mapstore/framework/components/I18N/Message";
 import controls from "@mapstore/framework/reducers/controls";
 
+import { getGeoNodeLocalConfig } from "@js/utils/APIUtils";
 import Button from "@js/components/Button";
 import OverlayContainer from "@js/components/OverlayContainer";
 import { getResourceId } from "@js/selectors/resource";
 
 import Form from "@rjsf/core";
 
-const jsonSchema = {
-  title: "Input Data",
-  type: "object",
-  required: [],
-  properties: {
-    input: {
-      type: "string",
-    },
-    PLD: {
-      in: "query",
-      type: "boolean",
-      title: "PLD plot",
-      description: "Whether a detection plot should be provided.",
-      default: true,
-    },
-    PLQ: {
-      in: "query",
-      type: "boolean",
-      title: "PLD plot",
-      description: "Whether a quantification plot should be provided.",
-      default: true,
-    },
-  },
-};
-
-const uiSchema = {
-    input: {
-      "ui:widget": "hidden",
-    },
-    PLD: {
-      "ui:widget": "radio",
-    },
-    PLQ: {
-      "ui:widget": "radio",
-    },
-  };
 
 const log = (type) => console.log.bind(console, type);
 
 async function getModels() {
-  return fetch(
-    "/proxy/?url=" + encodeURIComponent("http://172.18.0.1:5000/v2/models/")
-  )
-    .then((response) => response.json())
-    .catch(function (error) {
-      console.log("Show error notification!");
-      return Promise.reject(error);
-    });
+  const configPath = "mapstore/configs/litterassessmentConfig.json";
+  const configUrl =
+    getGeoNodeLocalConfig("geoNodeSettings.staticPath", "/static/") +
+    configPath;
+  return axios.get(configUrl);
 }
 
-function triggerAiInference({ formData }) {
-  console.info(`sending form data ...`);
+function triggerAiInference({ formData }, model) {
 
   const headers = {
     "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
+    Accept: "application/json",
   };
 
-  const data = assign(formData, { accept: "application/json" });
-  const url =
-    "http://172.18.0.1:5000/v2/models/litter_assessment_service/predict";
-  axios.post(url, data, headers).then((response) => {
-    console.info(`receiving response: ${JSON.stringify(response)}`);
-
-    // TODO handle jobID
+  const data = assign(formData, {
+    Accept: "application/json",
   });
+  const params = new URLSearchParams();
+  Object.keys(data).forEach((key) => params.append(key, data[key]));
 
-  return setTimeout(() => console.log("release"), 3000);
+  const url = "/proxy/?url=" + encodeURIComponent(model["apiUrl"]);
+  return axios
+    .post(url, params, headers)
+    .then((response) => {
+      console.info(`receiving response: ${JSON.stringify(response)}`);
+
+      // TODO handle jobID
+    })
+    .catch((err) => console.error("could not trigger litter assessment!", err));
 }
 
 function toWmsUrl(wmsLayerOptions, securityToken) {
@@ -114,11 +81,12 @@ function toWmsUrl(wmsLayerOptions, securityToken) {
 }
 
 function LitterAssessment({ enabled, wmsLayers = [], securityToken, onClose }) {
-  const [models, setModels] = useState([
-    { name: "model a" },
-    { name: "model b" },
-  ]);
-  const [formData, setFormData] = React.useState(null);
+  const [models, setModels] = useState({
+    "model a": { jsonSchema: {}, uiSchema: {} },
+    "model b": { jsonSchema: {}, uiSchema: {} },
+  });
+
+  const [selectedModel, setSelectedModel] = useState("");
 
   const isMounted = useRef(false);
   useEffect(() => {
@@ -130,12 +98,15 @@ function LitterAssessment({ enabled, wmsLayers = [], securityToken, onClose }) {
 
   useEffect(() => {
     getModels()
-      .then((response) => setModels(response.models))
-      .catch((error) => {
-        console.log(error);
+      .then((response) => {
+        const models = response.data.models; 
+        setSelectedModel(Object.keys(models)[0] || null)
+        setModels(models);
+      })
+      .catch((err) => {
+        console.error("could get models from config!", err);
       });
   }, []);
-
 
   // https://github.com/rjsf-team/react-jsonschema-form/blob/v4.2.3/docs/api-reference/form-props.md#children
 
@@ -161,18 +132,23 @@ function LitterAssessment({ enabled, wmsLayers = [], securityToken, onClose }) {
               <Message msgId="gnviewer.litterassessment.model" />
             </label>
 
-            <select>
-              {models.map((model) => (
-                <option>{model.name}</option>
-              ))}
+            <select
+              onChange={(event) => setSelectedModel(event.target.value)}
+              value={selectedModel}
+            >
+              {Object.keys(models)
+                .map((modelName, index) => (
+                  <option key={index} value={modelName}>
+                    {modelName}
+                  </option>
+                ))}
             </select>
 
             <Form
-              schema={jsonSchema}
-              uiSchema={uiSchema}
-              formData={{input: wmsLayer}}
-              onChange={(e) => setFormData(e.formData)}
-              onSubmit={(e) => triggerAiInference(e)}
+              schema={models[selectedModel]?.jsonSchema || {}}
+              uiSchema={models[selectedModel]?.uiSchema || {}}
+              formData={{ input: wmsLayer }}
+              onSubmit={(e) => triggerAiInference(e, models[selectedModel])}
               onError={log("errors")}
             >
               <div>

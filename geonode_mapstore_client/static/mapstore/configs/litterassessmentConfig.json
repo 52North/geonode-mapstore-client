@@ -1,0 +1,80 @@
+{
+  "models": {
+    "litterassessment": {
+      "apiUrl": "https://webhook.site/bed4c293-fae1-4262-bbac-de5d1fc86816",
+      "jsonSchema": {
+        "title": "Input Data",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "input": {
+            "type": "string"
+          },
+          "PLD": {
+            "in": "query",
+            "type": "boolean",
+            "title": "PLD plot",
+            "description": "Whether a detection plot should be provided.",
+            "default": true
+          },
+          "PLQ": {
+            "in": "query",
+            "type": "boolean",
+            "title": "PLD plot",
+            "description": "Whether a quantification plot should be provided.",
+            "default": true
+          }
+        }
+      },
+      "uiSchema": {
+        "input": {
+          "ui:widget": "hidden"
+        },
+        "PLD": {
+          "ui:widget": "radio"
+        },
+        "PLQ": {
+          "ui:widget": "radio"
+        }
+      }
+    },
+    "litterassessment2": {
+      "apiUrl": "http://172.18.0.1:5000/v2/models/litter_assessment_service/predict",
+      "jsonSchema": {
+        "title": "Input Data 2",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "input": {
+            "type": "string"
+          },
+          "PLD": {
+            "in": "query",
+            "type": "boolean",
+            "title": "PLD plot",
+            "description": "Whether a detection plot should be provided.",
+            "default": true
+          },
+          "PLQ": {
+            "in": "query",
+            "type": "boolean",
+            "title": "PLD plot",
+            "description": "Whether a quantification plot should be provided.",
+            "default": true
+          }
+        }
+      },
+      "uiSchema": {
+        "input": {
+          "ui:widget": "hidden"
+        },
+        "PLD": {
+          "ui:widget": "select"
+        },
+        "PLQ": {
+          "ui:widget": "select"
+        }
+      }
+    }
+  }
+}
