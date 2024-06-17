@@ -21,7 +21,7 @@
   "_resolved": "https://registry.npmjs.org/web-ifc/-/web-ifc-0.0.50.tgz",
   "_shasum": "0e0a03271fa5c9235c5c337c57c43ff838daf7d2",
   "_spec": "web-ifc@0.0.50",
-  "_where": "/home/runner/work/geonode-mapstore-client/geonode-mapstore-client/geonode_mapstore_client/client/MapStore2",
+  "_where": "/home/ridoo/data/coding/projects/plasticops/geonode-mapstore-client/geonode_mapstore_client/client/MapStore2",
   "author": {
     "name": "web-ifc"
   },
