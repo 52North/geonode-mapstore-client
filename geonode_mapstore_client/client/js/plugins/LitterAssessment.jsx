@@ -12,7 +12,10 @@ import { addAuthenticationParameter } from "@mapstore/framework/utils/SecurityUt
 import Message from "@mapstore/framework/components/I18N/Message";
 import controls from "@mapstore/framework/reducers/controls";
 
-import { getGeoNodeLocalConfig } from "@js/utils/APIUtils";
+import {
+  parseDevHostname,
+  getGeoNodeLocalConfig,
+} from '@js/utils/APIUtils';
 import Button from "@js/components/Button";
 import OverlayContainer from "@js/components/OverlayContainer";
 import { getResourceId } from "@js/selectors/resource";
@@ -23,7 +26,7 @@ import Form from "@rjsf/core";
 const log = (type) => console.log.bind(console, type);
 
 async function getModels() {
-  const configPath = "mapstore/configs/litterassessmentConfig.json";
+  const configPath = "litterassessment/litterassessmentConfig.json";
   const configUrl =
     getGeoNodeLocalConfig("geoNodeSettings.staticPath", "/static/") +
     configPath;
@@ -40,12 +43,10 @@ function triggerAiInference({ formData }, model) {
   const data = assign(formData, {
     Accept: "application/json",
   });
-  const params = new URLSearchParams();
-  Object.keys(data).forEach((key) => params.append(key, data[key]));
 
-  const url = "/proxy/?url=" + encodeURIComponent(model["apiUrl"]);
+  const url = parseDevHostname("/litterassessment/")
   return axios
-    .post(url, params, headers)
+    .post(url, formData, headers)
     .then((response) => {
       console.info(`receiving response: ${JSON.stringify(response)}`);
 
@@ -80,7 +81,7 @@ function toWmsUrl(wmsLayerOptions, securityToken) {
   return new URL(`${url}?${query}`).toString();
 }
 
-function LitterAssessment({ enabled, wmsLayers = [], securityToken, onClose }) {
+function LitterAssessment({ enabled, pk, wmsLayers = [], securityToken, onClose }) {
   const [models, setModels] = useState({
     "model a": { jsonSchema: {}, uiSchema: {} },
     "model b": { jsonSchema: {}, uiSchema: {} },
@@ -145,7 +146,7 @@ function LitterAssessment({ enabled, wmsLayers = [], securityToken, onClose }) {
             <Form
               schema={models[selectedModel]?.jsonSchema || {}}
               uiSchema={models[selectedModel]?.uiSchema || {}}
-              formData={{ input: wmsLayer }}
+              formData={{ imageUrl: wmsLayer, pk }}
               onSubmit={(e) => triggerAiInference(e, models[selectedModel])}
               onError={log("errors")}
             >
@@ -176,11 +177,13 @@ const LitterAssessmentPlugin = connect(
   createSelector(
     [
       (state) => state?.controls?.rightOverlay?.enabled === "LitterAssessment",
+      (state) => state?.gnresource?.data.pk || null,
       (state) => state.layers,
       (state) => state.security,
     ],
-    (enabled, layers, security) => ({
+    (enabled, pk, layers, security) => ({
       enabled,
+      pk,
       wmsLayers:
         layers?.flat?.filter(
           (l) => l.type === "wms" && (!l.group || l.group !== "background")
