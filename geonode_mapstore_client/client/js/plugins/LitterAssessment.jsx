@@ -40,10 +40,6 @@ function triggerAiInference({ formData }, model) {
     Accept: "application/json",
   };
 
-  const data = assign(formData, {
-    Accept: "application/json",
-  });
-
   const url = parseDevHostname("/litterassessment/")
   return axios
     .post(url, formData, headers)
