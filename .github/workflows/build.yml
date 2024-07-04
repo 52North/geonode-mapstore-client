@@ -7,9 +7,9 @@ concurrency:
   cancel-in-progress: true
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push events but only for the 4.3.x branch
+  # Triggers the workflow on push events but only for the feature/plasticops_trigger-ai-inference branch
   push:
-    branches: [ 4.3.x ]
+    branches: [ feature/plasticops_trigger-ai-inference ]
     paths: 
       - "VERSION"
       - "geonode_mapstore_client/client/**"
@@ -70,17 +70,10 @@ jobs:
       - name: "Stage files"
         run: git add --all
         
-      - name: "Generate temp GitHub token"
-        uses: tibdex/github-app-token@v1
-        id: generate-token
-        with:
-          app_id: ${{ secrets.TOKEN_APP_ID }}
-          private_key: ${{ secrets.TOKEN_APP_PRIVATE_KEY }}
-        
       - name: "Create Pull Request"
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v5
         with:
-          token: ${{ steps.generate-token.outputs.token }}
-          base: "4.3.x"
-          title: "new client build"
+          base: "feature/plasticops_trigger-ai-inference"
+          title: "[feature/plasticops_trigger-ai-inference] new client build"
           body: "Automated client build from GeoNode Client CI"
+          delete-branch: true
