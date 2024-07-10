@@ -33,7 +33,7 @@ async function getModels() {
   return axios.get(configUrl);
 }
 
-function triggerAiInference({ formData }, model) {
+function triggerAiInference({ formData }) {
 
   const headers = {
     "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
@@ -143,7 +143,7 @@ function LitterAssessment({ enabled, pk, wmsLayers = [], securityToken, onClose 
               schema={models[selectedModel]?.jsonSchema || {}}
               uiSchema={models[selectedModel]?.uiSchema || {}}
               formData={{ imageUrl: wmsLayer, pk }}
-              onSubmit={(e) => triggerAiInference(e, models[selectedModel])}
+              onSubmit={(e) => triggerAiInference(e)}
               onError={log("errors")}
             >
               <div>
