@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
+import Rx from "rxjs/Rx";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import { createSelector } from "reselect";
 import { Glyphicon } from "react-bootstrap";
 import assign from "object-assign";
@@ -13,6 +15,12 @@ import { setControlProperty } from "@mapstore/framework/actions/controls";
 import { addAuthenticationParameter } from "@mapstore/framework/utils/SecurityUtils";
 import Message from "@mapstore/framework/components/I18N/Message";
 import controls from "@mapstore/framework/reducers/controls";
+import { default as notifications } from "@mapstore/framework/components/notifications/NotificationContainer";
+import {
+  info as infoNotification,
+  error as errorNotification,
+  success as successNotification,
+} from "@mapstore/framework/actions/notifications";
 
 import { parseDevHostname, getGeoNodeLocalConfig } from "@js/utils/APIUtils";
 import Button from "@js/components/Button";
@@ -42,22 +50,56 @@ async function getModels() {
   return axios.get(configUrl);
 }
 
-function triggerAiInference(selectedModel, { formData }) {
+function _triggerAiInference(selectedModel, { formData }) {
   const headers = {
     "Content-type": "application/json",
     Accept: "application/json",
   };
 
-  const path = `/litterassessment/models/${selectedModel}/`
+  const path = `/litterassessment/models/${selectedModel}/`;
   const url = parseDevHostname(path);
-  return axios
-    .post(url, formData, headers)
-    .then((response) => {
-      console.info(`receiving response: ${JSON.stringify(response)}`);
-
-      // TODO handle jobID
+  return (dispatch) => {
+    Rx.Observable.defer(() => {
+      dispatch(
+        infoNotification({
+          title: "Litter Assessment",
+          message: "Triggering assessment ...",
+        })
+      );
+      return axios.post(url, formData, headers);
     })
-    .catch((err) => console.error("could not trigger litter assessment!", err));
+      .catch((err) => {
+        console.error("ai_inference API is not available!", err);
+        dispatch(
+          errorNotification({
+            title: "Litter Assessment",
+            message: "Could not connect to assessment service!",
+          })
+        );
+      })
+      .subscribe((response) => {
+        console.log(`job_id ${response.data.job_id}`);
+        const content = response.data;
+        const failStatuses = ["failed", "cancelled"];
+        const hasFailed =
+          response.status > 400 || failStatuses.includes(content.status);
+        if (hasFailed) {
+          dispatch(
+            errorNotification({
+              title: "Litter Assessment",
+              message: `Assessment could not be started! ${content.msg}`,
+            })
+          );
+        } else {
+          dispatch(
+            successNotification({
+              title: "Litter Assessment",
+              message: "Assessment started and will be uploaded once ready.",
+            })
+          );
+        }
+      });
+  };
 }
 
 function toWmsUrl(wmsLayerOptions, securityToken) {
@@ -91,6 +133,7 @@ function LitterAssessment({
   pk,
   wmsLayers = [],
   securityToken,
+  triggerAiInference,
   onClose,
 }) {
   const [models, setModels] = useState({});
@@ -257,9 +300,10 @@ const LitterAssessmentPlugin = connect(
       securityToken: security.token,
     })
   ),
-  {
+  (dispatch) => ({
     onClose: setControlProperty.bind(null, "rightOverlay", "enabled", false),
-  }
+    triggerAiInference: bindActionCreators(_triggerAiInference, dispatch),
+  })
 )(LitterAssessment);
 
 function LitterAssessmentButton({ enabled, variant, onClick, size }) {
