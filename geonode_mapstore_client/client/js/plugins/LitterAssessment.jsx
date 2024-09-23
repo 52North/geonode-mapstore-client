@@ -218,7 +218,7 @@ function LitterAssessment({
                 onError={log("errors")}
               >
                 <div class="submit-btn">
-                  <button type="submit" onClick="triggerAiInference">
+                  <button type="submit">
                     Submit
                   </button>
                 </div>
