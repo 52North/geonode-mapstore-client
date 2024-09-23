@@ -184,7 +184,7 @@ function LitterAssessment({
         <div className="gn-litterassessment-panel-body">
           <Message msgId="gnviewer.litterassessment.description" />
           <div>
-            <label for="model-select">
+            <label htmlFor="model-select">
               <Message msgId="gnviewer.litterassessment.model" />
             </label>
 
@@ -204,12 +204,12 @@ function LitterAssessment({
 
             <div>
               <h3>Description</h3>
-              <span class="model-description">
+              <span className="model-description">
                 {models[selectedModel]?.description}
               </span>
             </div>
 
-            <div class="model-input">
+            <div className="model-input">
               <Form
                 schema={jsonSchemas[selectedModel] || {}}
                 uiSchema={uischemas[selectedModel] || {}}
@@ -217,10 +217,8 @@ function LitterAssessment({
                 onSubmit={(e) => triggerAiInference(selectedModel, e)}
                 onError={log("errors")}
               >
-                <div class="submit-btn">
-                  <button type="submit">
-                    Submit
-                  </button>
+                <div className="submit-btn">
+                  <button type="submit">Submit</button>
                 </div>
               </Form>
             </div>
