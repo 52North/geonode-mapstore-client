@@ -629,7 +629,7 @@
                         {
                             "type": "plugin",
                             "name": "LitterAssessment",
-                            "disableIf": "{!(state('gnResourceData').subtype === 'raster' && context.resourceHasPermission(state('gnResourceData'), 'can_trigger_inference'))}"
+                            "disableIf": "{!(state('gnResourceData').subtype === 'raster' && context.userHasPermission(state('user'), 'can_trigger_inference'))}"
                         },
                         {
                             "type": "plugin",
