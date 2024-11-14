@@ -252,6 +252,7 @@ def run_setup_hooks(*args, **kwargs):
     settings.PROXY_ALLOWED_PARAMS_NEEDLES += (
         "request=getfeatureinfo",
         "request=getcapabilities",
+        "request=getmap",
     )
     settings.PROXY_ALLOWED_PATH_NEEDLES += (
         "tileset.json",

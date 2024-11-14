@@ -203,6 +203,11 @@
               "legendHeight": "Height",
               "legendPreview": "Preview"
             },
+            "enableInteractiveLegendInfo": {
+                "label": "Enable interactive legend",
+                "info": "If this option is enabled, filter by legend can be applied by clicking on legend items of this layer from the TOC. Note: This parameter requires specific configurations on GeoServer",
+                "fetchError": "Failed to retrieve the legend info from the service"
+            },
             "enableLocalizedLayerStyles": {
                 "label": "Enable localized style",
                 "tooltip": "Note: This parameter requires specific configurations on GeoServer"
@@ -374,7 +379,8 @@
             "Examples": "Examples",
             "LinkedinGroup": "Mapstore Linkedin Group",
             "scrollTop": "Scroll to the top of the page",
-            "footerDescription": "<strong>GeoSolutions</strong> <a href=\"mailto:sales@geosolutionsgroup.com\">sales@geosolutionsgroup.com</a>"
+            "footerDescription": "<strong>GeoSolutions</strong> <a href=\"mailto:sales@geosolutionsgroup.com\">sales@geosolutionsgroup.com</a>",
+            "footerCustomHTML": "<div><p>Please insert custom HTML into the translations to render a custom footer</p></div>"
         },
         "cookiesPolicyNotification": {
             "title": "This website uses cookies",
@@ -1111,7 +1117,7 @@
             "title": "Advanced search",
             "query": "Search",
             "apply": "Apply",
-            "reset": "Reset",
+            "reset": "Reset: reset all filters including any other external filter",
             "save": "Save",
             "discard": "Undo",
             "query_request_exception": "Request error",
@@ -1625,6 +1631,7 @@
             "advancedSettings": "Advanced settings",
             "templateMetadataAvailable": "Metadata available from Dublin Core format: abstract, boundingBox, contributor, creator, description, format, identifier, references, rights, source, subject, temporal, title, type, uri",
             "invalidUrlHttpProtocol": "This catalog cannot be added to the available ones because it uses an http protocol. Please provide a catalog url that uses https protocol",
+            "invalidArrayUsageForUrl": "The catalog URL could not be parsed correctly",
             "notification": {
                 "errorTitle": "Error",
                 "errorSearchingRecords": "Some records have not been found: {records} Please check the query URL and its parameters.",
@@ -3992,7 +3999,9 @@
           "emptyDescription": "Click on the map to start browsing the images of street view",
           "messages": {
             "noDataForPosition": "no street-view data for this position",
-            "unknownError": "unknown error, see console"
+            "unknownError": "unknown error, see console",
+            "errorServiceUrl": "Service not available. Please, check the provided URL",
+            "errorRetriveingLayerData": "There was an error loading the layer data"
           },
           "loadingAPI": "Loading API...",
           "cyclomedia": {

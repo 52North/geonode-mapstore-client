@@ -87,6 +87,9 @@
             "pending-approval": {
                 "filter{is_approved}": false
             },
+            "remote": {
+                "filter{sourcetype.in}": "REMOTE"
+            },
             "dataset": {
                 "filter{resource_type.in}": "dataset"
             },
@@ -101,6 +104,9 @@
             },
             "store-time-series": {
                 "filter{subtype.in}": "vector_time"
+            },
+            "3dtiles": {
+                "filter{subtype.in}": "3dtiles"
             },
             "document": {
                 "filter{resource_type.in}": "document"
@@ -143,6 +149,7 @@
             translationsPath: translationsPath,
             resourceId: '{{ resource.pk|default:"" }}',
             resourceType: '{{ resource.resource_type|default:"" }}',
+            resourceSubtype: '{{ resource.subtype|default:"" }}',
             isEmbed: isEmbed,
             pluginsConfigKey: pluginsConfigKey,
             pluginsConfigPatchRules: [...searchServicesPatchRules, ...pluginsConfigPatchRules],

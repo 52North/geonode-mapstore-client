@@ -8,7 +8,7 @@
 
 import isEqual from 'lodash/isEqual';
 import isEmpty from 'lodash/isEmpty';
-import isNil from 'lodash/isNil';
+import omit from 'lodash/omit';
 
 import {
     RESOURCE_LOADING,
@@ -35,11 +35,12 @@ import {
     SET_RESOURCE_PATH_PARAMETERS,
     SET_MAP_VIEWER_LINKED_RESOURCE,
     SET_DEFAULT_VIEWER_PLUGINS,
-    SET_SELECTED_LAYER_DATASET
+    SET_SELECTED_LAYER
 } from '@js/actions/gnresource';
 import {
     cleanCompactPermissions,
-    getGeoLimitsFromCompactPermissions
+    getGeoLimitsFromCompactPermissions,
+    getResourceAdditionalProperties
 } from '@js/utils/ResourceUtils';
 
 const defaultState = {
@@ -74,7 +75,8 @@ function gnresource(state = defaultState, action) {
         };
     }
     case SET_RESOURCE: {
-        const { data, ...resource } = action.data || {};
+        const actionData = getResourceAdditionalProperties(action.data || {});
+        const { data, ...resource } = actionData;
         let updatedResource = {...resource};
         const linkedResources = state.data?.linkedResources;
         if (!isEmpty(linkedResources) && updatedResource.pk === state.data?.pk) {
@@ -83,7 +85,7 @@ function gnresource(state = defaultState, action) {
 
         return {...state,
             error: null,
-            initialResource: { ...action.data },
+            initialResource: { ...actionData },
             data: updatedResource,
             loading: false,
             isNew: false
@@ -239,17 +241,17 @@ function gnresource(state = defaultState, action) {
     case SET_MAP_VIEWER_LINKED_RESOURCE:
         return {
             ...state,
-            viewerLinkedResource: action.resource
+            viewerLinkedResource: { ...getResourceAdditionalProperties(omit(action.resource, ['data'])) }
         };
     case SET_DEFAULT_VIEWER_PLUGINS:
         return {
             ...state,
             defaultViewerPlugins: action.plugins
         };
-    case SET_SELECTED_LAYER_DATASET:
+    case SET_SELECTED_LAYER:
         return {
             ...state,
-            selectedLayerIsDataset: !isNil(action.layer?.extendedParams?.pk)
+            selectedLayer: action.layer
         };
     default:
         return state;

@@ -52,6 +52,7 @@ import tooltip from '@mapstore/framework/components/misc/enhancers/tooltip';
 import { getSelectedLayer, layersSelector } from '@mapstore/framework/selectors/layers';
 import useLocalStorage from '@js/hooks/useLocalStorage';
 import TemplateSelector from '@js/plugins/visualstyleeditor/TemplateSelector';
+import { isDefaultDatasetSubtype } from '@js/utils/ResourceUtils';
 
 const Button = tooltip(GNButton);
 
@@ -306,14 +307,21 @@ function StyleEditorTocButton({
     layer,
     status,
     onClick = () => {},
-    enabled,
+    changeResource,
     isNew,
     btnProps = {},
     hide,
-    selectedStyle
+    selectedStyle,
+    statusTypes
 }) {
-
-    if (!(!hide && status === 'LAYER' && layer?.extendedParams?.mapLayer && (enabled || isNew))) {
+    const mapLayer = layer?.extendedParams?.mapLayer;
+    if (hide
+    || status !== statusTypes.LAYER
+    || !mapLayer?.dataset
+    || mapLayer?.dataset?.sourcetype === 'REMOTE'
+    || !changeResource
+    || isNew
+    || !isDefaultDatasetSubtype(mapLayer?.dataset?.subtype)) {
         return null;
     }
 
@@ -347,7 +355,7 @@ const ConnectedStyleEditorTocButton = connect(createSelector([
     isNewResource
 ], (layer, perms, newMap) => ({
     layer,
-    enabled: !!perms?.includes('change_resourcebase'),
+    changeResource: !!perms?.includes('change_resourcebase'),
     isNew: newMap
 })), {
     onClick: requestDatasetAvailableStyles

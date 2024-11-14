@@ -78,7 +78,7 @@ import gnsearchEpics from '@js/epics/gnsearch';
 import favoriteEpics from '@js/epics/favorite';
 import maplayout from '@mapstore/framework/reducers/maplayout';
 
-import pluginsDefinition, { storeEpicsNamesToExclude } from '@js/plugins/index';
+import pluginsDefinition, { storeEpicsNamesToExclude, cleanEpics } from '@js/plugins/index';
 import ReactSwipe from 'react-swipeable-views';
 import SwipeHeader from '@mapstore/framework/components/data/identify/SwipeHeader';
 
@@ -129,7 +129,6 @@ getEndpoints()
                     pluginsConfigKey,
                     query,
                     configEpics,
-                    mapType = 'openlayers',
                     onStoreInit,
                     targetId = 'ms-container',
                     settings
@@ -138,7 +137,7 @@ getEndpoints()
                     const mapLayout = getConfigProp('mapLayout') || {};
                     setConfigProp('mapLayout', mapLayout[query.theme] || mapLayout.viewer);
 
-                    const appEpics = {
+                    const appEpics = cleanEpics({
                         ...standardEpics,
                         ...configEpics,
                         gnCheckSelectedDatasetPermissions,
@@ -151,71 +150,67 @@ getEndpoints()
                         updateMapLayoutEpic,
                         // needed to initialize the correct time range
                         ...timelineEpics
-                    };
+                    });
 
                     storeEpicsNamesToExclude(appEpics);
 
-                    // register custom arcgis layer
-                    import('@js/map/' + mapType + '/plugins/ArcGisMapServer')
-                        .then(() => {
-                            main({
-                                targetId,
-                                enableExtensions: true,
-                                appComponent: withRoutes(routes)(ConnectedRouter),
-                                loaderComponent: MainLoader,
-                                initialState: {
-                                    defaultState: {
-                                        ...securityState
-                                    }
-                                },
-                                themeCfg: null,
-                                pluginsConfig: getPluginsConfigOverride(getPluginsConfiguration(localConfig.plugins, pluginsConfigKey)),
-                                pluginsDef: {
-                                    plugins: {
-                                        ...pluginsDefinition.plugins
-                                    },
-                                    requires: {
-                                        ...requires,
-                                        ...pluginsDefinition.requires
-                                    }
-                                },
-                                printEnabled: true,
-                                rootReducerFunc: standardRootReducerFunc,
-                                onStoreInit,
-                                appReducers: {
-                                    ...standardReducers,
-                                    gnresource,
-                                    resourceservice,
-                                    gnsettings,
-                                    security,
-                                    maptype,
-                                    print,
-                                    maplayout,
-                                    controls,
-                                    timeline,
-                                    dimension,
-                                    playback,
-                                    mapPopups,
-                                    catalog,
-                                    searchconfig,
-                                    widgets,
-                                    geostory,
-                                    gnsearch,
-                                    notifications,
-                                    context,
-                                    ...pluginsDefinition.reducers
-                                },
-                                appEpics,
-                                geoNodeConfiguration,
-                                initialActions: [
-                                // add some settings in the global state to make them accessible in the monitor state
-                                // later we could use expression in localConfig
-                                    updateGeoNodeSettings.bind(null, settings),
-                                    loadPrintCapabilities.bind(null, getConfigProp('printUrl'))
-                                ]
+                    main({
+                        targetId,
+                        enableExtensions: true,
+                        appComponent: withRoutes(routes)(ConnectedRouter),
+                        loaderComponent: MainLoader,
+                        initialState: {
+                            defaultState: {
+                                ...securityState
+                            }
+                        },
+                        themeCfg: null,
+                        pluginsConfig: getPluginsConfigOverride(getPluginsConfiguration(localConfig.plugins, pluginsConfigKey)),
+                        pluginsDef: {
+                            plugins: {
+                                ...pluginsDefinition.plugins
                             },
-                            withExtensions(StandardApp));
-                        });
+                            requires: {
+                                ...requires,
+                                ...pluginsDefinition.requires
+                            }
+                        },
+                        printEnabled: true,
+                        rootReducerFunc: standardRootReducerFunc,
+                        onStoreInit,
+                        appReducers: {
+                            ...standardReducers,
+                            gnresource,
+                            resourceservice,
+                            gnsettings,
+                            security,
+                            maptype,
+                            print,
+                            maplayout,
+                            controls,
+                            timeline,
+                            dimension,
+                            playback,
+                            mapPopups,
+                            catalog,
+                            searchconfig,
+                            widgets,
+                            geostory,
+                            gnsearch,
+                            notifications,
+                            context,
+                            ...pluginsDefinition.reducers
+                        },
+                        appEpics,
+                        geoNodeConfiguration,
+                        initialActions: [
+                        // add some settings in the global state to make them accessible in the monitor state
+                        // later we could use expression in localConfig
+                            updateGeoNodeSettings.bind(null, settings),
+                            loadPrintCapabilities.bind(null, getConfigProp('printUrl'))
+                        ]
+                    },
+                    withExtensions(StandardApp));
                 });
 
         })

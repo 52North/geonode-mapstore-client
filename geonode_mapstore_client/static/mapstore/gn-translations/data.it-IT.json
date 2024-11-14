@@ -148,7 +148,8 @@
             "noPreview": "Un'anteprima non è disponibile per questa risorsa",
             "na": "N/D",
             "emptyFilterItems": "Nessun elemento da visualizzare",
-            "loadingItems": "Caricamento elementi..."
+            "loadingItems": "Caricamento elementi...",
+            "3dtiles": "3D Tiles"
         },
         "viewer": {
             "document": {
@@ -291,6 +292,11 @@
             "supportedFiles": "Estensioni supportate",
             "unsupportedFiles": "File non supportati per il caricamento",
             "upload": "Carica",
+            "addFromUrl": "Aggiungi da URL...",
+            "invalidUrl": "Inserisci un URL assoluto valido",
+            "unsupportedUrlServiceType": "Seleziona un tipo di servizio",
+            "remoteResourceURLPlaceholder": "URL risorsa...",
+            "invalidRemoteUploadMessageErrorTooltip": "Il processo di caricamento non è riuscito. Controlla la validità dell'URL e prova a caricarlo di nuovo",
 
             "uploadDataset": "Carica un dataset",
             "dragAndDropFile": "Trascina e rilascia un file da caricare",
@@ -407,7 +413,9 @@
                     }
                 }
             },
-            "allResources": "All resources"
+            "allResources": "All resources",
+            "assets": "Assets",
+            "includeFullscreen": "Includi fullscreen"
         }
     }
 }

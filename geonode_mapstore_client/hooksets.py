@@ -26,6 +26,8 @@ def resource_detail_url(resource_type, resource_id):
     _resource_type = resource_type
     if resource_type == "mapviewer":
         _resource_type = "viewer"
+    if resource_type == "3dtiles":
+        _resource_type = f"dataset/3dtiles"
     return "/catalogue/#/{}/{}".format(_resource_type, resource_id)
 
 
@@ -153,6 +155,16 @@ class MapStoreHookSet(BaseHookSet):
 
     def geoapp_detail_url(self, resource):
         return resource_detail_url(resource.resource_type, resource.id)
+    
+    # 3dtiles
+
+    def tiles3d_detail_url(self, resource):
+        return resource_detail_url(resource.subtype, resource.id)
+
+    def resourcebase_embed_template(self, context=None):
+        if context['resource'].subtype == '3dtiles':
+            return "geonode-mapstore-client/dataset_embed.html"
+        return "geonode-mapstore-client/base_embed.html"
 
     # Map Persisting
     def viewer_json(self, conf, context=None):
@@ -177,4 +189,10 @@ class MapStoreHookSet(BaseHookSet):
             )
         resource_identifier = resource.id
         resource_type = resource.resource_type
+        if resource.subtype == '3dtiles':
+            return resource_detail_url(resource.subtype, resource_identifier)
         return resource_detail_url(resource_type, resource_identifier)
+
+    def get_absolute_url(self, instance):
+        if instance.subtype == '3dtiles':
+            return self.tiles3d_detail_url(instance)

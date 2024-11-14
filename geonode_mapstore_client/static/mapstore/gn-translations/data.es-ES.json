@@ -146,7 +146,8 @@
             "noPreview": "Una vista previa no está disponible para este recurso",
             "na": "N/A",
             "emptyFilterItems": "No hay elementos para mostrar",
-            "loadingItems": "Cargando artículos..."
+            "loadingItems": "Cargando artículos...",
+            "3dtiles": "3D Tiles"
         },
         "viewer": {
             "document": {
@@ -288,6 +289,11 @@
             "supportedFiles": "Extensiones de archivo admitidas",
             "unsupportedFiles": "Archivos no admitidos para la carga",
             "upload": "Subir",
+            "addFromUrl": "Agregar desde URL...",
+            "invalidUrl": "Insertar una URL absoluta válida",
+            "unsupportedUrlServiceType": "Seleccionar un tipo de servicio",
+            "remoteResourceURLPlaceholder": "URL del recurso...",
+            "invalidRemoteUploadMessageErrorTooltip": "El proceso de carga falló. Verifique la validez de la URL e intente cargarla nuevamente",
 
             "uploadDataset": "Subir un conjunto de datos",
             "dragAndDropFile": "Arrastra y suelta un archivo para cargar",
@@ -404,7 +410,9 @@
                     }
                 }
             },
-            "allResources": "All resources"
+            "allResources": "All resources",
+            "assets": "Assets",
+            "includeFullscreen": "Incluir pantalla completa"
         }
     }
 }

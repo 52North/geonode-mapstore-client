@@ -164,7 +164,8 @@ export const gnSaveContent = (action$, store) =>
                         saveSuccess(resource),
                         setResource({
                             ...currentResource,
-                            ...body
+                            ...body,
+                            ...resource
                         }),
                         updateResource(resource),
                         ...(action.showNotifications

@@ -203,6 +203,11 @@
               "legendHeight": "Hauteur",
               "legendPreview": "Aperçu"
             },
+            "enableInteractiveLegendInfo": {
+                "label": "Activer la légende interactive",
+                "info": "Si cette option est activée, le filtre par légende peut être appliqué en cliquant sur les éléments de légende de cette couche depuis la table des matières. Remarque: ce paramètre nécessite des configurations spécifiques sur GeoServer",
+                "fetchError": "Impossible d'obtenir les informations de légende du service"
+            },
             "enableLocalizedLayerStyles": {
                 "label": "Activer le style localisé",
                 "tooltip": "Remarque: ce paramètre nécessite des configurations spécifiques sur GeoServer"
@@ -374,7 +379,8 @@
             "Examples": "Exemples",
             "LinkedinGroup": "Groupe Linkedin Mapstore",
             "scrollTop": "Retour en haut de la page",
-            "footerDescription": "<strong>GeoSolutions</strong> <a href=\"mailto:sales@geosolutionsgroup.com\">sales@geosolutionsgroup.com</a>"
+            "footerDescription": "<strong>GeoSolutions</strong> <a href=\"mailto:sales@geosolutionsgroup.com\">sales@geosolutionsgroup.com</a>",
+            "footerCustomHTML": "<div><p>Veuillez insérer du HTML personnalisé dans les traductions pour afficher un pied de page personnalisé</p></div>"
         },
         "cookiesPolicyNotification": {
             "title": "Ce site utilise des cookies",
@@ -1111,7 +1117,7 @@
             "title": "Recherche avancée",
             "query": "Recherche",
             "apply": "Appliquer",
-            "reset": "Recommencer",
+            "reset": "Réinitialiser: réinitialiser tous les filtres, y compris tous les autres filtres externes",
             "save": "Enregistrer",
             "discard": "Annuler",
             "query_request_exception": "Erreur de requête",
@@ -1626,6 +1632,7 @@
             "advancedSettings": "Réglages avancés",
             "templateMetadataAvailable": "Métadonnées disponibles pour le format Dublin Core : abstract, boundingBox, contributor, creator, description, format, identifier, references, rights, source, subject, temporal, title, type, uri",
             "invalidUrlHttpProtocol": "Ce catalogue ne peut pas être ajouté à ceux disponibles car il utilise un protocole http. Veuillez fournir une URL de catalogue qui utilise le protocole https.",
+            "invalidArrayUsageForUrl": "L'URL du catalogue n'a pas pu être lue correctement",
             "notification": {
                 "errorTitle": "Erreur",
                 "errorSearchingRecords": "Certains enregistrements n'ont pas été trouvés: {records} . Veuillez vérifier l'URL de la requête et ses paramètres.",
@@ -3981,8 +3988,10 @@
           "emptyDescription": "Cliquez sur la carte pour commencer à parcourir les images de Street View",
           "messages": {
             "noDataForPosition": "pas de données Street View pour cette position",
-            "unknownError": "erreur inconnue, voir console"
-          },
+            "unknownError": "erreur inconnue, voir console",
+            "errorServiceUrl": "Service non disponible. Veuillez vérifier l'URL fournie",
+            "errorRetriveingLayerData": "Une erreur s'est produite lors du chargement des données de la couche"
+        },
           "loadingAPI": "Chargement de l'API...",
           "cyclomedia": {
             "initializing": "Initialisation de l'API Street Smart...",

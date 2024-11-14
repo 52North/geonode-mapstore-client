@@ -5,7 +5,7 @@
 
 GeoNode MapStore Client is a frontend application that interacts with the GeoNode API V2 to allows users to navigate and discover GeoNode resources. The client application provided by this repository is a MapStore downstream project an Open Source WebGIS framework based on ReactJS. 
 
-### Tools supported versions
+## Tools tested versions
 
-- node >= v12.18.4
-- npm >= 6.14.6 and < 7
+- node 20.13.1
+- npm 10.5.2

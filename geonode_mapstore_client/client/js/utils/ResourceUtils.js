@@ -16,6 +16,7 @@ import { ProcessTypes, ProcessStatus } from '@js/utils/ResourceServiceUtils';
 import { uniqBy, orderBy, isString, isObject, pick, difference } from 'lodash';
 import { excludeGoogleBackground, extractTileMatrixFromSources } from '@mapstore/framework/utils/LayersUtils';
 import { determineResourceType } from '@js/utils/FileUtils';
+import { isImageServerUrl } from '@mapstore/framework/utils/ArcGISUtils';
 
 /**
 * @module utils/ResourceUtils
@@ -51,6 +52,8 @@ export const GXP_PTYPES = {
     'GN_WMS': 'gxp_geonodecataloguesource'
 };
 
+export const isDefaultDatasetSubtype = (subtype) => !subtype || ['vector', 'raster', 'remote', 'vector_time'].includes(subtype);
+
 export const FEATURE_INFO_FORMAT = 'TEMPLATE';
 
 const datasetAttributeSetToFields = ({ attribute_set: attributeSet = [] }) => {
@@ -85,7 +88,8 @@ export const resourceToLayerConfig = (resource) => {
         pk,
         has_time: hasTime,
         default_style: defaultStyle,
-        ptype
+        ptype,
+        subtype
     } = resource;
 
     const bbox = getExtentFromResource(resource);
@@ -104,6 +108,21 @@ export const resourceToLayerConfig = (resource) => {
         ...defaultStyleParams
     };
 
+    if (subtype === '3dtiles') {
+
+        const { url: tilesetUrl } = links.find(({ extension }) => (extension === '3dtiles')) || {};
+
+        return {
+            id: uuid(),
+            type: '3dtiles',
+            title,
+            url: parseDevHostname(tilesetUrl || ''),
+            ...(bbox && { bbox }),
+            visibility: true,
+            extendedParams
+        };
+    }
+
     switch (ptype) {
     case GXP_PTYPES.REST_MAP:
     case GXP_PTYPES.REST_IMG: {
@@ -113,7 +132,9 @@ export const resourceToLayerConfig = (resource) => {
             id: uuid(),
             pk,
             type: 'arcgis',
-            name: alternate.replace('remoteWorkspace:', ''),
+            ...(isImageServerUrl(arcgisUrl)
+                ? { queryable: false }
+                : { name: alternate.replace('remoteWorkspace:', '') }),
             url: arcgisUrl,
             ...(bbox && { bbox }),
             title,
@@ -175,7 +196,7 @@ export const resourceToLayerConfig = (resource) => {
     }
 };
 
-function updateUrlQueryParameter(requestUrl, query) {
+function updateUrlQueryParameter(requestUrl = '', query) {
     const parsedUrl = url.parse(requestUrl, true);
     return url.format({
         ...parsedUrl,
@@ -281,13 +302,14 @@ export const getResourceTypesInfo = () => ({
     [ResourceTypes.DATASET]: {
         icon: 'database',
         canPreviewed: (resource) => resourceHasPermission(resource, 'view_resourcebase'),
-        formatEmbedUrl: (resource) => parseDevHostname(updateUrlQueryParameter(resource.embed_url, {
+        formatEmbedUrl: (resource) => resource.embed_url && parseDevHostname(updateUrlQueryParameter(resource.embed_url, {
             config: 'dataset_preview'
         })),
         formatDetailUrl: (resource) => resource?.detail_url && parseDevHostname(resource.detail_url),
         name: 'Dataset',
-        formatMetadataUrl: (resource) => (`/datasets/${resource.store ? resource.store + ":" : ''}${resource.alternate}/metadata`),
-        catalogPageUrl: '/datasets'
+        formatMetadataUrl: (resource) => isDefaultDatasetSubtype(resource?.subtype)
+            ? `/datasets/${resource.store ? resource.store + ":" : ''}${resource.alternate}/metadata`
+            : `/resources/${resource.pk}/metadata`
     },
     [ResourceTypes.MAP]: {
         icon: 'map',
@@ -297,8 +319,7 @@ export const getResourceTypesInfo = () => ({
             config: 'map_preview'
         })),
         formatDetailUrl: (resource) => resource?.detail_url && parseDevHostname(resource.detail_url),
-        formatMetadataUrl: (resource) => (`/maps/${resource.pk}/metadata`),
-        catalogPageUrl: '/maps'
+        formatMetadataUrl: (resource) => (`/maps/${resource.pk}/metadata`)
     },
     [ResourceTypes.DOCUMENT]: {
         icon: 'file',
@@ -308,8 +329,7 @@ export const getResourceTypesInfo = () => ({
         formatEmbedUrl: (resource) => isDocumentExternalSource(resource) ? undefined : resource?.embed_url && parseDevHostname(resource.embed_url),
         formatDetailUrl: (resource) => resource?.detail_url && parseDevHostname(resource.detail_url),
         formatMetadataUrl: (resource) => (`/documents/${resource.pk}/metadata`),
-        metadataPreviewUrl: (resource) => (`/documents/${resource.pk}/metadata_detail?preview`),
-        catalogPageUrl: '/documents'
+        metadataPreviewUrl: (resource) => (`/documents/${resource.pk}/metadata_detail?preview`)
     },
     [ResourceTypes.GEOSTORY]: {
         icon: 'book',
@@ -317,8 +337,7 @@ export const getResourceTypesInfo = () => ({
         canPreviewed: (resource) => resourceHasPermission(resource, 'view_resourcebase'),
         formatEmbedUrl: (resource) => resource?.embed_url && parseDevHostname(resource.embed_url),
         formatDetailUrl: (resource) => resource?.detail_url && parseDevHostname(resource.detail_url),
-        formatMetadataUrl: (resource) => (`/apps/${resource.pk}/metadata`),
-        catalogPageUrl: '/geostories'
+        formatMetadataUrl: (resource) => (`/apps/${resource.pk}/metadata`)
     },
     [ResourceTypes.DASHBOARD]: {
         icon: 'dashboard',
@@ -326,8 +345,7 @@ export const getResourceTypesInfo = () => ({
         canPreviewed: (resource) => resourceHasPermission(resource, 'view_resourcebase'),
         formatEmbedUrl: (resource) => resource?.embed_url && parseDevHostname(resource.embed_url),
         formatDetailUrl: (resource) => resource?.detail_url && parseDevHostname(resource.detail_url),
-        formatMetadataUrl: (resource) => (`/apps/${resource.pk}/metadata`),
-        catalogPageUrl: '/dashboards'
+        formatMetadataUrl: (resource) => (`/apps/${resource.pk}/metadata`)
     },
     [ResourceTypes.VIEWER]: {
         icon: 'cogs',
@@ -335,8 +353,7 @@ export const getResourceTypesInfo = () => ({
         canPreviewed: (resource) => resourceHasPermission(resource, 'view_resourcebase'),
         formatEmbedUrl: () => false,
         formatDetailUrl: (resource) => resource?.detail_url && parseDevHostname(resource.detail_url),
-        formatMetadataUrl: (resource) => (`/apps/${resource.pk}/metadata`),
-        catalogPageUrl: '/all'
+        formatMetadataUrl: (resource) => (`/apps/${resource.pk}/metadata`)
     }
 });
 
@@ -449,11 +466,13 @@ export function getGeoNodeMapLayers(data) {
                 }),
                 extra_params: {
                     msId: layer.id,
-                    styles: cleanStyles(layer?.availableStyles)
-                        .map(({ canEdit, metadata, ...style }) => ({ ...style }))
+                    ...(layer?.availableStyles && {
+                        styles: cleanStyles(layer?.availableStyles)
+                            .map(({ canEdit, metadata, ...style }) => ({ ...style }))
+                    })
                 },
-                current_style: layer.style || '',
-                name: layer.name,
+                ...(layer.type === 'wms' && { current_style: layer.style || '' }),
+                name: layer.name || '',
                 order: index,
                 opacity: layer.opacity ?? 1,
                 visibility: layer.visibility
@@ -498,15 +517,17 @@ export function toMapStoreMapConfig(resource, baseConfig) {
         .map((layer) => {
             const mapLayer = maplayers.find(mLayer => layer.id !== undefined && mLayer?.extra_params?.msId === layer.id);
             if (mapLayer) {
-                const mapLayerDatasetStyles = cleanStyles([
+                const mapLayerDatasetStyles = layer.type === 'wms' ? cleanStyles([
                     ...(mapLayer?.dataset?.defaul_style ? [mapLayer.dataset.defaul_style] : []),
                     ...(mapLayer?.dataset?.styles || [])
-                ]).map(({ name }) => name);
+                ]).map(({ name }) => name) : [];
                 const template = mapLayer?.dataset?.featureinfo_custom_template || '';
                 return {
                     ...layer,
-                    style: mapLayer.current_style || layer.style || '',
-                    availableStyles: cleanStyles(mapLayer?.extra_params?.styles || [], mapLayerDatasetStyles),
+                    ...(layer.type === 'wms' && {
+                        style: mapLayer.current_style || layer.style || '',
+                        availableStyles: cleanStyles(mapLayer?.extra_params?.styles || [], mapLayerDatasetStyles)
+                    }),
                     featureInfo: {
                         ...layer?.featureInfo,
                         format: layer?.featureInfo?.format ?? (template ? FEATURE_INFO_FORMAT : undefined),
@@ -766,14 +787,16 @@ export const getResourceWithLinkedResources = (resource = {}) => {
     return resource;
 };
 
-export const onDeleteRedirectTo = (resources = []) => {
-    let redirectUrl = '/';
-    if (!isEmpty(resources) && resources?.length === 1) {
-        const types = getResourceTypesInfo();
-        const { catalogPageUrl } = types[resources[0].resource_type] ?? {};
-        if (catalogPageUrl) {
-            redirectUrl = catalogPageUrl;
-        }
-    }
-    return redirectUrl;
+export const getResourceAdditionalProperties = (_resource = {}) => {
+    const resource =  getResourceWithLinkedResources(_resource);
+    const links = resource?.links || [];
+    const assets = links.filter(link => link?.extras?.type === 'asset' && link?.extras?.content?.title);
+    return {
+        ...resource,
+        ...(assets?.length && { assets })
+    };
+};
+
+export const onDeleteRedirectTo = () => {
+    return '/';
 };

@@ -1,12 +1,12 @@
 # This is a basic workflow to help you get started with Actions
 
-name: GeoNode Client CI 4.3.x (tests)
+name: GeoNode Client 4.4.x CI (tests)
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow pull request events but only for the 4.3.x branch
+  # Triggers the workflow pull request events but only for the 4.4.x branch
   pull_request:
-    branches: [ 4.3.x ]
+    branches: [ 4.4.x ]
     paths: 
       - "geonode_mapstore_client/client/**"
 
