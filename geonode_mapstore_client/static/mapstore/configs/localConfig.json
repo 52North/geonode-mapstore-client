@@ -932,7 +932,6 @@
                 "name": "Print",
                 "cfg": {
                     "useFixedScales": true,
-                    "mapWidth": 256,
                     "outputFormatOptions": {
                         "allowedFormats": [
                             {
@@ -946,6 +945,14 @@
                             {
                                 "value": "jpg",
                                 "name": "JPEG"
+                            },
+                            {
+                                "value": "gif",
+                                "name": "GIF"
+                            },
+                            {
+                                "value": "tiff",
+                                "name": "TIFF"
                             }
                         ]
                     }
@@ -1000,6 +1007,22 @@
                         "rotation": 90,
                         "verticalAlign": "top",
                         "textAlign": "center"
+                    }
+                }
+            },
+            {
+                "name": "PrintAuthor",
+                "override": {
+                    "Print": {
+                        "position": 6
+                    }
+                }
+            },
+            {
+                "name": "PrintCopyright",
+                "override": {
+                    "Print": {
+                        "position": 7
                     }
                 }
             },
@@ -1815,7 +1838,6 @@
                 "name": "Print",
                 "cfg": {
                     "useFixedScales": true,
-                    "mapWidth": 256,
                     "outputFormatOptions": {
                         "allowedFormats": [
                             {
@@ -1829,6 +1851,14 @@
                             {
                                 "value": "jpg",
                                 "name": "JPEG"
+                            },
+                            {
+                                "value": "gif",
+                                "name": "GIF"
+                            },
+                            {
+                                "value": "tiff",
+                                "name": "TIFF"
                             }
                         ]
                     }
@@ -1883,6 +1913,22 @@
                         "rotation": 90,
                         "verticalAlign": "top",
                         "textAlign": "center"
+                    }
+                }
+            },
+            {
+                "name": "PrintAuthor",
+                "override": {
+                    "Print": {
+                        "position": 6
+                    }
+                }
+            },
+            {
+                "name": "PrintCopyright",
+                "override": {
+                    "Print": {
+                        "position": 7
                     }
                 }
             },
