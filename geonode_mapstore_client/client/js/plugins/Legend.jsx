@@ -31,7 +31,10 @@ function Legend({
     currentZoomLvl,
     scales,
     language,
-    currentLocale
+    currentLocale,
+    projection,
+    mapSize,
+    mapBbox
 }) {
 
     const [expandLegend, setExpandLegend] = useState(false);
@@ -54,7 +57,10 @@ function Legend({
                 <TOC
                     map={{
                         layers: layers.map(applyVersionParamToLegend),
-                        groups: []
+                        groups: [],
+                        bbox: mapBbox,
+                        size: mapSize,
+                        projection
                     }}
                     theme="legend"
                     config={{
@@ -97,7 +103,10 @@ const ConnectedLegend = connect(
             map && map.mapOptions && map.mapOptions.view && map.mapOptions.view.DPI || null
         ),
         language: isLocalizedLayerStylesEnabled ? currentLocaleLanguage : null,
-        currentLocale
+        currentLocale,
+        projection: map?.projection || 'EPSG:3857',
+        mapSize: map?.size,
+        mapBbox: map?.bbox
     })),
     {
         onUpdateNode: updateNode
