@@ -31,6 +31,35 @@ import Form from "@rjsf/core";
 
 const log = (type) => console.log.bind(console, type);
 
+async function createGroupSelectorWidget(setInferenceGroup) {
+  const url = parseDevHostname("/api/v2/groups?exclude[]=*&include[]=title&include[]=pk");
+    const group_response = await fetch(url, {"Accept": "application/json"});
+    const json = await group_response.json()
+    const groups = json.group_profiles.map(group => {
+      return {
+        title: group.title,
+        pk: group.pk
+      };
+    });
+
+    if (groups.length > 0) {
+      // set state to first group
+      setInferenceGroup(`${groups[0].pk}`);
+    }
+    return props => (
+      <select
+        required={props.required}
+        onChange={(event) => setInferenceGroup(`${event.target.value.pk}`)}
+      >
+        {groups.map((group, index) => (
+          <option key={index} value={group.pk}>
+            {group.title}
+          </option>
+        ))}
+      </select>
+    )
+}
+
 async function getUiSchemas() {
   const baseUrl = getGeoNodeLocalConfig(
     "geoNodeSettings.staticPath",
@@ -140,10 +169,22 @@ function LitterAssessment({
   const [uischemas, setSchemas] = useState({});
   const [jsonSchemas, setJsonSchemas] = useState({});
   const [selectedModel, setSelectedModel] = useState("");
+  const [inferenceGroup, setInferenceGroup] = useState(null);
+  const [widgets, setWidgets] = useState({});
 
   const isMounted = useRef(false);
   useEffect(() => {
     isMounted.current = true;
+
+    createGroupSelectorWidget(setInferenceGroup)
+      .then(GroupSelectorWidget => {
+        setWidgets({
+          groupSelectorWidget: GroupSelectorWidget
+        });
+      })
+      .catch(err => {
+        console.error("could not create group select!", err);
+      });
 
     getOpenApiSchema()
       .then(async (response) => {
@@ -183,8 +224,13 @@ function LitterAssessment({
       });
 
     getUiSchemas()
-      .then((response) => {
+      .then(async response => {
         const schemas = response.data.schemas;
+        Object.values(schemas).forEach(schema => {
+          schema.inferenceGroup = {
+            "ui:widget": "groupSelectorWidget"
+          }
+        });
         setSchemas(schemas);
       })
       .catch((err) => {
@@ -254,9 +300,10 @@ function LitterAssessment({
 
             <div className="model-input">
               <Form
+                widgets={widgets}
                 schema={jsonSchemas[selectedModel] || {}}
                 uiSchema={uischemas[selectedModel] || {}}
-                formData={{ imageUrl: wmsLayer, pk }}
+                formData={{ imageUrl: wmsLayer, pk, inferenceGroup }}
                 onSubmit={(e) => triggerAiInference(selectedModel, e)}
                 onError={log("errors")}
               >
