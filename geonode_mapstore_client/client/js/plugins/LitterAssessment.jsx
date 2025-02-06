@@ -159,12 +159,15 @@ function toWmsUrl(wmsLayerOptions, securityToken) {
 
 function LitterAssessment({
   enabled,
-  pk,
+  resource,
   wmsLayers = [],
   securityToken,
   triggerAiInference,
   onClose,
 }) {
+  const pk = resource?.pk
+  const title = resource?.title
+
   const [models, setModels] = useState({});
   const [uischemas, setSchemas] = useState({});
   const [jsonSchemas, setJsonSchemas] = useState({});
@@ -303,7 +306,7 @@ function LitterAssessment({
                 widgets={widgets}
                 schema={jsonSchemas[selectedModel] || {}}
                 uiSchema={uischemas[selectedModel] || {}}
-                formData={{ imageUrl: wmsLayer, pk, inferenceGroup }}
+                formData={{ imageUrl: wmsLayer, pk, title, inferenceGroup }}
                 onSubmit={(e) => triggerAiInference(selectedModel, e)}
                 onError={log("errors")}
               >
@@ -333,13 +336,13 @@ const LitterAssessmentPlugin = connect(
   createSelector(
     [
       (state) => state?.controls?.rightOverlay?.enabled === "LitterAssessment",
-      (state) => state?.gnresource?.data.pk || null,
+      (state) => state?.gnresource?.data || null,
       (state) => state.layers,
       (state) => state.security,
     ],
-    (enabled, pk, layers, security) => ({
+    (enabled, resource, layers, security) => ({
       enabled,
-      pk,
+      resource,
       wmsLayers:
         layers?.flat?.filter(
           (l) => l.type === "wms" && (!l.group || l.group !== "background")
