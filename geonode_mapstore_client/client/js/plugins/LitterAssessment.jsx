@@ -11,15 +11,16 @@ import jp from "jsonpath";
 
 import axios from "@mapstore/framework/libs/ajax";
 import { createPlugin } from "@mapstore/framework/utils/PluginsUtils";
+import { mapSelector } from "@mapstore/framework/selectors/map";
+import { getExtentFromViewport} from "@mapstore/framework/utils/CoordinatesUtils";
 import { setControlProperty } from "@mapstore/framework/actions/controls";
 import { addAuthenticationParameter } from "@mapstore/framework/utils/SecurityUtils";
 import Message from "@mapstore/framework/components/I18N/Message";
 import controls from "@mapstore/framework/reducers/controls";
-import { default as notifications } from "@mapstore/framework/components/notifications/NotificationContainer";
 import {
   info as infoNotification,
   error as errorNotification,
-  success as successNotification,
+  success as successNotification
 } from "@mapstore/framework/actions/notifications";
 
 import { parseDevHostname, getGeoNodeLocalConfig } from "@js/utils/APIUtils";
@@ -32,32 +33,34 @@ import Form from "@rjsf/core";
 const log = (type) => console.log.bind(console, type);
 
 async function createGroupSelectorWidget(setInferenceGroup) {
-  const url = parseDevHostname("/api/v2/groups?exclude[]=*&include[]=title&include[]=pk");
-    const group_response = await fetch(url, {"Accept": "application/json"});
-    const json = await group_response.json()
-    const groups = json.group_profiles.map(group => {
-      return {
-        title: group.title,
-        pk: group.pk
-      };
-    });
+  const url = parseDevHostname(
+    "/api/v2/groups?exclude[]=*&include[]=title&include[]=group"
+  );
+  const group_response = await fetch(url, { Accept: "application/json" });
+  const json = await group_response.json();
+  const groupProfiles = json.group_profiles.map((profile) => {
+    return {
+      title: profile.group.name,
+      pk: profile.group.pk
+    };
+  });
 
-    if (groups.length > 0) {
-      // set state to first group
-      setInferenceGroup(`${groups[0].pk}`);
-    }
-    return props => (
-      <select
-        required={props.required}
-        onChange={(event) => setInferenceGroup(`${event.target.value.pk}`)}
-      >
-        {groups.map((group, index) => (
-          <option key={index} value={group.pk}>
-            {group.title}
-          </option>
-        ))}
-      </select>
-    )
+  if (groupProfiles.length > 0) {
+    // set state to first group
+    setInferenceGroup(`${groupProfiles[0].pk}`);
+  }
+  return (props) => (
+    <select
+      required={props.required}
+      onChange={(event) => setInferenceGroup(`${event.target.value.pk}`)}
+    >
+      {groupProfiles.map((group, index) => (
+        <option key={index} value={group.pk}>
+          {group.title}
+        </option>
+      ))}
+    </select>
+  );
 }
 
 async function getUiSchemas() {
@@ -82,7 +85,7 @@ async function getModels() {
 function _triggerAiInference(selectedModel, { formData }) {
   const headers = {
     "Content-type": "application/json",
-    Accept: "application/json",
+    Accept: "application/json"
   };
 
   const path = `/litterassessment/models/${selectedModel}/`;
@@ -92,7 +95,7 @@ function _triggerAiInference(selectedModel, { formData }) {
       dispatch(
         infoNotification({
           title: "Litter Assessment",
-          message: "Triggering assessment ...",
+          message: "Triggering assessment ..."
         })
       );
       return axios.post(url, formData, headers);
@@ -102,7 +105,7 @@ function _triggerAiInference(selectedModel, { formData }) {
         dispatch(
           errorNotification({
             title: "Litter Assessment",
-            message: "Could not connect to assessment service!",
+            message: "Could not connect to assessment service!"
           })
         );
       })
@@ -116,14 +119,14 @@ function _triggerAiInference(selectedModel, { formData }) {
           dispatch(
             errorNotification({
               title: "Litter Assessment",
-              message: `Assessment could not be started! ${content.msg}`,
+              message: `Assessment could not be started! ${content.msg}`
             })
           );
         } else {
           dispatch(
             successNotification({
               title: "Litter Assessment",
-              message: "Assessment started and will be uploaded once ready.",
+              message: "Assessment started and will be uploaded once ready."
             })
           );
         }
@@ -131,9 +134,13 @@ function _triggerAiInference(selectedModel, { formData }) {
   };
 }
 
-function toWmsUrl(wmsLayerOptions, securityToken) {
+function toWmsUrl(wmsLayerOptions, map, securityToken) {
   const bounds = wmsLayerOptions.bbox.bounds;
-  const bbox = [bounds.minx, bounds.miny, bounds.maxx, bounds.maxy];
+  const bboxDeg = [bounds.minx, bounds.miny, bounds.maxx, bounds.maxy];
+  const projection = map.projection;
+  const bboxMeters = getExtentFromViewport(wmsLayerOptions.bbox, projection);
+  const width = (bboxMeters[2] - bboxMeters[0]) * 1000;
+  const height = (bboxMeters[3] - bboxMeters[1]) * 1000;
   const queryParameters = assign(
     {},
     {
@@ -143,11 +150,11 @@ function toWmsUrl(wmsLayerOptions, securityToken) {
       TRANSPARENT: true,
       SERVICE: "WMS",
       REQUEST: "GetMap",
-      WIDTH: "1000",
-      HEIGHT: "600",
-      BBOX: bbox,
+      WIDTH: Math.floor(width),
+      HEIGHT: Math.floor(height),
+      BBOX: bboxDeg,
       TILED: false,
-      VERSION: "1.3.0",
+      VERSION: "1.3.0"
     }
   );
 
@@ -160,13 +167,14 @@ function toWmsUrl(wmsLayerOptions, securityToken) {
 function LitterAssessment({
   enabled,
   resource,
+  map,
   wmsLayers = [],
   securityToken,
   triggerAiInference,
-  onClose,
+  onClose
 }) {
-  const pk = resource?.pk
-  const title = resource?.title
+  const pk = resource?.pk;
+  const title = resource?.title;
 
   const [models, setModels] = useState({});
   const [uischemas, setSchemas] = useState({});
@@ -175,17 +183,21 @@ function LitterAssessment({
   const [inferenceGroup, setInferenceGroup] = useState(null);
   const [widgets, setWidgets] = useState({});
 
+  const wmsUrl = wmsLayers?.length && map
+      ? toWmsUrl(wmsLayers[0], map, securityToken)
+      : "";
+
   const isMounted = useRef(false);
   useEffect(() => {
     isMounted.current = true;
 
     createGroupSelectorWidget(setInferenceGroup)
-      .then(GroupSelectorWidget => {
+      .then((GroupSelectorWidget) => {
         setWidgets({
           groupSelectorWidget: GroupSelectorWidget
         });
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("could not create group select!", err);
       });
 
@@ -227,12 +239,12 @@ function LitterAssessment({
       });
 
     getUiSchemas()
-      .then(async response => {
+      .then(async (response) => {
         const schemas = response.data.schemas;
-        Object.values(schemas).forEach(schema => {
+        Object.values(schemas).forEach((schema) => {
           schema.inferenceGroup = {
             "ui:widget": "groupSelectorWidget"
-          }
+          };
         });
         setSchemas(schemas);
       })
@@ -257,10 +269,6 @@ function LitterAssessment({
       isMounted.current = false;
     };
   }, []);
-
-  const wmsLayer = wmsLayers?.length
-    ? toWmsUrl(wmsLayers[0], securityToken)
-    : "";
 
   return (
     <OverlayContainer enabled={enabled} className="gn-overlay-wrapper">
@@ -306,7 +314,7 @@ function LitterAssessment({
                 widgets={widgets}
                 schema={jsonSchemas[selectedModel] || {}}
                 uiSchema={uischemas[selectedModel] || {}}
-                formData={{ imageUrl: wmsLayer, pk, title, inferenceGroup }}
+                formData={{ imageUrl: wmsUrl, pk, title, inferenceGroup }}
                 onSubmit={(e) => triggerAiInference(selectedModel, e)}
                 onError={log("errors")}
               >
@@ -324,12 +332,12 @@ function LitterAssessment({
 
 LitterAssessment.propTypes = {
   enabled: PropTypes.bool,
-  onClose: PropTypes.func,
+  onClose: PropTypes.func
 };
 
 LitterAssessment.defaultProps = {
   enabled: false,
-  onClose: () => {},
+  onClose: () => {}
 };
 
 const LitterAssessmentPlugin = connect(
@@ -337,22 +345,24 @@ const LitterAssessmentPlugin = connect(
     [
       (state) => state?.controls?.rightOverlay?.enabled === "LitterAssessment",
       (state) => state?.gnresource?.data || null,
+      (state) => mapSelector(state),
       (state) => state.layers,
-      (state) => state.security,
+      (state) => state.security
     ],
-    (enabled, resource, layers, security) => ({
+    (enabled, resource, map, layers, security) => ({
       enabled,
       resource,
+      map,
       wmsLayers:
         layers?.flat?.filter(
           (l) => l.type === "wms" && (!l.group || l.group !== "background")
         ) || [],
-      securityToken: security.token,
+      securityToken: security.token
     })
   ),
   (dispatch) => ({
     onClose: setControlProperty.bind(null, "rightOverlay", "enabled", false),
-    triggerAiInference: bindActionCreators(_triggerAiInference, dispatch),
+    triggerAiInference: bindActionCreators(_triggerAiInference, dispatch)
   })
 )(LitterAssessment);
 
@@ -370,7 +380,7 @@ function LitterAssessmentButton({ enabled, variant, onClick, size }) {
 
 const ConnectedLitterAssessmentButton = connect(
   createSelector(getResourceId, (resourceId) => ({
-    enabled: resourceId !== undefined,
+    enabled: resourceId !== undefined
   })),
   {
     onClick: setControlProperty.bind(
@@ -378,7 +388,7 @@ const ConnectedLitterAssessmentButton = connect(
       "rightOverlay",
       "enabled",
       "LitterAssessment"
-    ),
+    )
   }
 )(LitterAssessmentButton);
 
@@ -387,11 +397,11 @@ export default createPlugin("LitterAssessment", {
   containers: {
     ActionNavbar: {
       name: "LitterAssessment",
-      Component: ConnectedLitterAssessmentButton,
-    },
+      Component: ConnectedLitterAssessmentButton
+    }
   },
   epics: {},
   reducers: {
-    controls,
-  },
+    controls
+  }
 });
