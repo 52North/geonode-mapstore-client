@@ -152,7 +152,8 @@ function toWmsUrl(wmsLayerOptions, map, securityToken) {
       REQUEST: "GetMap",
       WIDTH: Math.floor(width),
       HEIGHT: Math.floor(height),
-      BBOX: bboxDeg,
+      CRS: projection,
+      BBOX: bboxMeters,
       TILED: false,
       VERSION: "1.3.0"
     }
