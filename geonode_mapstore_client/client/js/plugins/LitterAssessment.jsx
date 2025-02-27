@@ -40,8 +40,10 @@ async function createGroupSelectorWidget(setInferenceGroup) {
   const json = await group_response.json();
   const groupProfiles = json.group_profiles.map((profile) => {
     return {
+      // we take the profile's name
       title: profile.group.name,
-      pk: profile.group.pk
+      // but have to reference the core group
+      pk: profile.pk
     };
   });
 
