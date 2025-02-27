@@ -138,9 +138,9 @@ function toWmsUrl(wmsLayerOptions, map, securityToken) {
   const bounds = wmsLayerOptions.bbox.bounds;
   const bboxDeg = [bounds.minx, bounds.miny, bounds.maxx, bounds.maxy];
   const projection = map.projection;
-  const bboxMeters = getExtentFromViewport(wmsLayerOptions.bbox, projection);
-  const width = (bboxMeters[2] - bboxMeters[0]) * 1000;
-  const height = (bboxMeters[3] - bboxMeters[1]) * 1000;
+  const bboxMetric = getExtentFromViewport(wmsLayerOptions.bbox, projection);
+  const width = (bboxMetric[2] - bboxMetric[0]);
+  const height = (bboxMetric[3] - bboxMetric[1]);
   const queryParameters = assign(
     {},
     {
@@ -153,7 +153,7 @@ function toWmsUrl(wmsLayerOptions, map, securityToken) {
       WIDTH: Math.floor(width),
       HEIGHT: Math.floor(height),
       CRS: projection,
-      BBOX: bboxMeters,
+      BBOX: bboxMetric,
       TILED: false,
       VERSION: "1.3.0"
     }
