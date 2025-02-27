@@ -139,8 +139,15 @@ function toWmsUrl(wmsLayerOptions, map, securityToken) {
   const bboxDeg = [bounds.minx, bounds.miny, bounds.maxx, bounds.maxy];
   const projection = map.projection;
   const bboxMetric = getExtentFromViewport(wmsLayerOptions.bbox, projection);
-  const width = (bboxMetric[2] - bboxMetric[0]);
-  const height = (bboxMetric[3] - bboxMetric[1]);
+
+  
+  const delta_x = (bboxMetric[2] - bboxMetric[0]);
+  const delta_y = (bboxMetric[3] - bboxMetric[1]);
+  // scale to get a width around 1000px
+  const scale = 1000 / delta_x;
+  const width = Math.floor(scale * delta_x);
+  const height = Math.floor(scale * delta_y);
+
   const queryParameters = assign(
     {},
     {
@@ -150,8 +157,8 @@ function toWmsUrl(wmsLayerOptions, map, securityToken) {
       TRANSPARENT: true,
       SERVICE: "WMS",
       REQUEST: "GetMap",
-      WIDTH: Math.floor(width),
-      HEIGHT: Math.floor(height),
+      WIDTH: width,
+      HEIGHT: height,
       CRS: projection,
       BBOX: bboxMetric,
       TILED: false,
